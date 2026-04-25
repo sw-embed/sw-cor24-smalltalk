@@ -21,6 +21,7 @@ case "$DEMO" in
   d3_boolean)  IMG="$REPO_DIR/src/image_d3.bas" ;;
   d4_max)      IMG="$REPO_DIR/src/image_d4.bas" ;;
   d5_calc)     IMG="$REPO_DIR/src/image_d5.bas" ;;
+  d6_fact)     IMG="$REPO_DIR/src/image_d6.bas" ;;
   *) echo "unknown demo: $DEMO" >&2 ; exit 2 ;;
 esac
 DRV="$REPO_DIR/examples/${DEMO}.bas"

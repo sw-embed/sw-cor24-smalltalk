@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 006-demo-d5-calc)_
+_Updated: 2026-04-24 (saga step 007-demo-d6-fact)_
 
 ## What runs today
 
@@ -36,6 +36,14 @@ _Updated: 2026-04-24 (saga step 006-demo-d5-calc)_
   BASIC. `tests/d5_calc.in` is a canned transcript; `scripts/
   build.sh` splices it between the trailing `RUN` and `BYE` so
   `./scripts/run.sh d5_calc` is reproducible.
+- **Demo D6: `5 fact` -> `120`** via a real recursive
+  `SmallInteger>>fact` method. Uses the `JUMP_IF_FALSE` pattern
+  from D4 (must, since blocks are eager in v0; an `ifTrue:ifFalse:`
+  fact would loop forever computing `(self - 1) fact` even at the
+  base case). Stress-tested up to `10 fact = 3628800` -- recursion
+  depth 11, well within the 19-frame stack. First proof that the
+  frame stack handles non-trivial nesting. Run with
+  `./scripts/run.sh d6_fact`.
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -193,6 +201,11 @@ both already queued in the saga:
   read the operand byte then add it to P; for offsets in scratch
   RAM, PEEK returns the full signed 24-bit word, so backward
   jumps work natively without sign-extension tricks.
+- 2026-04-24: D6 working — `5 fact -> 120` via real recursive
+  `SmallInteger>>fact`. The trick is `JUMP_IF_FALSE` (eager
+  blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
+  to `10 fact = 3628800` (depth-11 recursion). No new VM features
+  needed.
 - 2026-04-24: D5 working — interactive integer calculator REPL.
   PRIM 5 (print) extended to print booleans (`TRUE`, `FALSE`)
   and `NIL` rather than raising E=22 on a heap ref; the smallint

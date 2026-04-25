@@ -1,0 +1,1 @@
+D5 interactive calculator REPL works; all 5 operations verified from canned transcript (5+3=8, 7-2=5, 4*6=24, 2<3=TRUE, 5 max:3=5); PRIM 5 extended for Booleans+nil; build.sh splices tests/<demo>.in for reproducible interactive demos; D1-D4 regress

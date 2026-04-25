@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 003-demo-d3-boolean)_
+_Updated: 2026-04-24 (saga step 005-demo-d4-max)_
 
 ## What runs today
 
@@ -19,6 +19,13 @@ _Updated: 2026-04-24 (saga step 003-demo-d3-boolean)_
   cleanup_target+1+n), `<` returning the True singleton ref (8),
   and polymorphic dispatch on Boolean class. Run with
   `./scripts/run.sh d3_boolean`.
+- **Demo D4: `5 max: 3` -> `5`** via a user-defined method
+  `SmallInteger>>max:` that uses `JUMP_IF_FALSE` for *real*
+  conditional control flow inside the method's bytecode (not
+  D3's eager-argument cheat). Skipping past the unselected branch
+  matters for any non-trivial Smalltalk method (recursion,
+  loops, guard clauses) — D4 is the smallest demonstration that
+  it works. Run with `./scripts/run.sh d4_max`.
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -80,11 +87,15 @@ matches whatever just shipped.
 
 - Mini source REPL (saga step 4 in `docs/plan.md`; not yet
   added to the agentrail saga as a separate step).
-- `PUSH_LIT`, `JUMP`, `JUMP_IF_FALSE`, `STORE_TEMP` — bytecodes
-  reserved in `docs/design.md` § 5 but not exercised by D1/D2/D3
-  and currently stubbed (return `E=1`).
-- A `README.md`. Now that D1/D2/D3 all run, the next saga step
-  (009-v0-release-notes) writes one.
+- `PUSH_LIT` and `STORE_TEMP` — bytecodes reserved in
+  `docs/design.md` § 5 but not exercised by any demo and
+  currently stubbed (return `E=1`). D2's `init` writes via
+  `STORE_FIELD`, not `STORE_TEMP`; no demo needs a literal table
+  beyond the inline `PUSH_INT` byte.
+- Inheritance / superclass walk in LOOKUP. Single-level lookup
+  is enough for D1-D4.
+- Real Block closures. v0's `ifTrue:ifFalse:` is eager-arg.
+  D4 is the in-method alternative.
 
 ## Reality check on the substrate
 
@@ -164,3 +175,11 @@ both already queued in the saga:
   n`. Block evaluation is *eager* in v0: callers compute both
   branches and pass them as arguments; the receiver class
   selects which one to return.
+- 2026-04-24: D4 working — `5 max: 3` -> 5 via a user-defined
+  `SmallInteger>>max:` method whose bytecode uses
+  `JUMP_IF_FALSE` to skip past the unselected branch. Both
+  `5 max: 3` and `3 max: 5` were verified before the canonical
+  driver was settled on the former. JUMP and JUMP_IF_FALSE both
+  read the operand byte then add it to P; for offsets in scratch
+  RAM, PEEK returns the full signed 24-bit word, so backward
+  jumps work natively without sign-extension tricks.

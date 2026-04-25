@@ -89,6 +89,7 @@ model work end-to-end:
 | D1 | `examples/d1_add.bas` | `7` | `3 + 4` via `SmallInteger>>+` (primitive method) |
 | D2 | `examples/d2_counter.bas` | `2` | `Counter` class with one instance variable; user-defined methods (`init`, `incr`, `value`); nested send (`incr` calls `+`) across user/primitive method boundaries |
 | D3 | `examples/d3_boolean.bas` | `42` | `5 < 10 ifTrue: 42 ifFalse: 0` via True/False objects with their own polymorphic `ifTrue:ifFalse:` methods. No native `IF` is used to make the choice — the receiver class does. |
+| D4 | `examples/d4_max.bas` | `5` | `5 max: 3` via `SmallInteger>>max:` whose bytecode uses `JUMP_IF_FALSE` to actually skip the unselected branch — real conditional control flow inside a Smalltalk method, not D3's eager-argument cheat. |
 
 Six upstream feature requests are filed against `sw-cor24-basic`
 (issues #2-#7) for parallel development of v0.1 cleanups:
@@ -117,6 +118,7 @@ sibling BASIC interpreter.
 ./scripts/run.sh d1_add
 ./scripts/run.sh d2_counter
 ./scripts/run.sh d3_boolean
+./scripts/run.sh d4_max
 ```
 
 Each script writes `build/<demo>.bas` and feeds it to the

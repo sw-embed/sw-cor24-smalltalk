@@ -1,6 +1,6 @@
 number = 9
 slug = "refactor-image-data"
-status = "blocked"
+status = "in-progress"
 description = """
 # Step: refactor-image-data (depends on FR-2 in sw-cor24-basic)
 

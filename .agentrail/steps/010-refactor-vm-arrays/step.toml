@@ -1,8 +1,8 @@
-number = 12
-slug = "debug-cont-stepper"
+number = 10
+slug = "refactor-vm-arrays"
 status = "pending"
 description = """
-# Step: debug-cont-stepper (depends on FR-6 in sw-cor24-basic)
+# Step: refactor-vm-arrays (depends on FR-1 in sw-cor24-basic)
 
 **BLOCKED unt..."""
 role = "production"

@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 007-demo-d6-fact)_
+_Updated: 2026-04-24 (saga step 008-demo-d7-bounded-counter)_
 
 ## What runs today
 
@@ -44,6 +44,15 @@ _Updated: 2026-04-24 (saga step 007-demo-d6-fact)_
   depth 11, well within the 19-frame stack. First proof that the
   frame stack handles non-trivial nesting. Run with
   `./scripts/run.sh d6_fact`.
+- **Demo D7: BoundedCounter -> `5`** via inheritance. A
+  `BoundedCounter` (class id 11) extends `Counter` (10) and
+  overrides `incr` to cap at 5; `init` and `value` are inherited
+  via a superclass walk added to LOOKUP. After 6 incrs from 0,
+  the value clamps at 5. Proves: (a) the receiver's class wins
+  on dispatch (incr resolves to BoundedCounter's override); (b)
+  missing methods walk `class_super[]` at addresses 752..767
+  until the chain terminates at -1 (set by INSTALL_SINGLETONS
+  for class 0).
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -206,6 +215,18 @@ both already queued in the saga:
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-24: D7 working — inheritance via superclass walk.
+  `class_super[]` lives at scratch addresses 752..767;
+  INSTALL_SINGLETONS now sets `class_super[0] = -1` so the chain
+  terminates at Object. LOOKUP retries on each superclass on
+  miss; bug fix: previous LOOKUP wrote `T = -1` instead of
+  `Q = -1` on no-match (latent because D1-D6 never missed).
+  Driver line-collision class of bug bit again: D7 driver
+  initially used line 800 for END which forced execution to fall
+  through image's lines 100-299 a second time after dispatch
+  returned, triggering an out-of-balance RETURN. Fixed by
+  putting END at line 99 so execution halts cleanly before
+  re-entering the image's range.
 - 2026-04-24: D5 working — interactive integer calculator REPL.
   PRIM 5 (print) extended to print booleans (`TRUE`, `FALSE`)
   and `NIL` rather than raising E=22 on a heap ref; the smallint

@@ -1,6 +1,6 @@
 number = 7
 slug = "demo-d6-fact"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: demo-d6-fact
 
@@ -9,5 +9,6 @@ Add demo D6: `5 fact -> 120` via a real recursive
 role = "production"
 context_files = []
 created_at = "2026-04-24T19:58:39"
+completed_at = "2026-04-24T20:14:33"
 task_type = "production"
-commits = []
+commits = ["1c6b85eae3673b74cda9fb9bae81954bcf921adc"]

@@ -92,6 +92,7 @@ model work end-to-end:
 | D4 | `examples/d4_max.bas` | `5` | `5 max: 3` via `SmallInteger>>max:` whose bytecode uses `JUMP_IF_FALSE` to actually skip the unselected branch — real conditional control flow inside a Smalltalk method, not D3's eager-argument cheat. |
 | D5 | `examples/d5_calc.bas` | varies | Interactive integer calculator REPL: prompts for `A`, `op`, `B`, runs `A op B` through the VM, prints the result, loops until `op = 0`. `op` is the selector id (1=+, 2=-, 3=\*, 4=<, 14=max:). The first user-facing program; uses BASIC `INPUT` since v1 has no string variables for a true source REPL. |
 | D6 | `examples/d6_fact.bas` | `120` | `5 fact` via a *recursive* `SmallInteger>>fact` whose body uses `JUMP_IF_FALSE` to skip past the recursive branch at the base case. Verified up to `10 fact = 3628800` (recursion depth 11, comfortably within the 19-frame stack). The first proof that the v0 frame stack handles non-trivial nesting. |
+| D7 | `examples/d7_bounded.bas` | `5` | `BoundedCounter` extends `Counter`, overriding `incr` to cap at 5; `init` and `value` are inherited via the superclass walk added to LOOKUP. After 6 increments from 0, the value clamps at 5 instead of reaching 6. The first proof that v0 dispatches via inheritance (the receiver's class is consulted first; misses walk `class_super[]`). |
 
 Six upstream feature requests are filed against `sw-cor24-basic`
 (issues #2-#7) for parallel development of v0.1 cleanups:
@@ -123,6 +124,7 @@ sibling BASIC interpreter.
 ./scripts/run.sh d4_max
 ./scripts/run.sh d5_calc       # interactive REPL; see "Test transcripts" below
 ./scripts/run.sh d6_fact
+./scripts/run.sh d7_bounded
 ```
 
 ### Test transcripts

@@ -1,0 +1,143 @@
+# COR24 Smalltalk v0 — Status
+
+_Updated: 2026-04-24 (saga step 001-phase-1-bootstrap)_
+
+## What runs today
+
+- **Demo D1: `3 + 4` -> `7`** via real `SmallInteger>>+` dispatch
+  through `CLASSOF -> LOOKUP -> ACTIVATE -> PRIM 1`. Run with
+  `./scripts/run.sh d1_add`. This is the project's first claim
+  of being "Smalltalk".
+- All four substrate smoke tests in `examples/smoke/` pass under
+  the sibling `pv24t`:
+  - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
+    *signed* words including negatives. (Confirmed; see § "Reality
+    check" below for the parser-overflow gotcha discovered while
+    writing it.)
+  - `tag_bit.bas`: `V - (V/2)*2` extracts the low bit correctly
+    for non-negative refs.
+  - `gosub_chain.bas`: 14-deep `IF GOSUB` dispatch over 100
+    iterations runs in ~30 ms via `pv24t`. Adequate for the demos;
+    motivates FR-3 only if we go to bigger images.
+  - `prog_size.bas`: 200 `POKE` lines plus loops fit easily in the
+    16 KB tokenised program area.
+
+## What exists in this repo
+
+- `CLAUDE.md`, `COPYRIGHT`, `LICENSE`.
+- `docs/{prd,architecture,design,plan,status}.md`,
+  `docs/research.txt` (research transcript inherited),
+  `docs/process.md`, `docs/tools.md`,
+  `docs/ai_agent_instructions.md` (placeholders inherited from
+  the BASIC repo; cargo-flavoured, will be rewritten when the
+  Smalltalk toolchain stabilises).
+- `.agentrail/` saga `v0-bootstrap` with 9 steps:
+  001-phase-1-bootstrap (in progress, this commit closes it),
+  002 demo-d2-counter, 003 demo-d3-boolean, 004
+  refactor-image-data (gated on FR-2), 005 refactor-vm-arrays
+  (gated on FR-1), 006 refactor-dispatch-on (gated on FR-3),
+  007 refactor-mod-and-bits (gated on FR-4 + FR-5), 008
+  debug-cont-stepper (gated on FR-6), 009 v0-release-notes.
+- `scripts/{build,run,run-bare}.sh`.
+- `src/vm.bas` — heap helpers, eval stack, dispatch loop, SEND,
+  primitives 1-6 (with primitives 2/3/4/6 untested until D2/D3).
+- `src/image_d1.bas` — installs `SmallInteger>>+`.
+- `examples/d1_add.bas` — top-level driver.
+- `examples/smoke/*.bas` — substrate smoke tests.
+
+## Upstream feature requests filed
+
+In priority order (each unblocks a distinct, parallel-mergeable
+saga step here):
+
+| FR | sw-cor24-basic issue | Unblocks step |
+|---|---|---|
+| FR-2 DATA/READ/RESTORE | sw-embed/sw-cor24-basic#2 | 004-refactor-image-data |
+| FR-1 DIM arrays | sw-embed/sw-cor24-basic#3 | 005-refactor-vm-arrays |
+| FR-3 ON GOTO/GOSUB | sw-embed/sw-cor24-basic#4 | 006-refactor-dispatch-on |
+| FR-4 MOD operator | sw-embed/sw-cor24-basic#5 | 007-refactor-mod-and-bits |
+| FR-5 Bitwise ops | sw-embed/sw-cor24-basic#6 | 007-refactor-mod-and-bits |
+| FR-6 CONT after STOP | sw-embed/sw-cor24-basic#7 | 008-debug-cont-stepper |
+
+Parallel-development contract: as soon as any FR merges and ships
+in `../sw-cor24-basic`, this repo's corresponding refactor step
+unblocks and can run independently. The BASIC agent works the FRs
+in the order above; this agent picks up whichever refactor
+matches whatever just shipped.
+
+## What does not exist yet
+
+- Demos D2 (Counter) and D3 (Boolean) — saga steps 002 and 003.
+  The VM scaffolding for both is in `vm.bas` but stubs only
+  (PUSH_FIELD/STORE_FIELD/PUSH_TEMP/JUMP*/RETURN_TOP all set
+  E=1).
+- Mini source REPL.
+- A `README.md` (by convention, written after D2/D3 ship).
+
+## Reality check on the substrate
+
+All five substrate behaviours v0 depends on are now empirically
+verified, not just inferred from `basic.pas`:
+
+1. Integer expressions and `LET` — every demo uses these.
+2. `IF`, `GOTO`, `GOSUB`/`RETURN`, `FOR`/`NEXT` — exercised by
+   smoke tests and the VM dispatch loop.
+3. `PEEK`/`POKE` 0..1023 store full 24-bit signed words
+   (-8388608..+8388607), confirmed by `peek_word_store.bas`.
+   *Caveat discovered in this step*: BASIC v1's integer-literal
+   parser silently overflows on values > 8388607 (e.g. the
+   literal `16777215` is parsed via repeated `n*10` accumulation
+   and wraps), so any image needing the full positive range must
+   compute the value in BASIC rather than write it as a literal.
+   The smoke test now uses 8388607, 1048576, 65536, 255, -1.
+4. `PRINT` of a SmallInt outputs no leading space and a trailing
+   newline — perfect for primitive 5 (`print`).
+5. The 16 KB tokenised program area easily holds image + VM +
+   driver: D1's combined source is 346 lines, well under the cap.
+
+Known substrate bug: `ABS` is broken (sw-cor24-basic#1). v0
+does not use `ABS`.
+
+## Immediate next step
+
+Saga step `002-demo-d2-counter` — implement a user-defined
+`Counter` class with one instance variable and three methods.
+This requires fleshing out the currently-stubbed opcode handlers
+in `vm.bas`:
+
+- PUSH_FIELD / STORE_FIELD (instance variable access)
+- A real RETURN_TOP that pops a frame
+- Frame-stack push in SEND for non-primitive methods
+
+`vm.bas` already reserves the line ranges and address regions
+for these; only the bodies need filling in.
+
+## Out of scope (also see `prd.md` § 6)
+
+- A general Smalltalk parser, real Block closures, GC,
+  metaclasses, image save/load, the visual tile editor.
+- Any C, Python, or Rust source in this repo.
+
+## Decision log
+
+- 2026-04-24: project created.
+- 2026-04-24: hosting language for v0 is BASIC (the sibling
+  `sw-cor24-basic` v1 dialect). The Smalltalk VM will be a
+  ~1000-line BASIC program, mirroring the historical 1972
+  BASIC-hosted Smalltalk evaluator described in
+  `docs/research.txt`.
+- 2026-04-24: heap and dictionaries live in BASIC's PEEK/POKE
+  scratch RAM (1024 24-bit words). The 26 BASIC variables A-Z
+  serve as VM registers (mapping in `architecture.md` § 3).
+- 2026-04-24: bytecode set frozen at 14 opcodes for v0
+  (`design.md` § 5).
+- 2026-04-24: agentrail saga `v0-bootstrap` initialised with 9
+  steps; FRs filed against `sw-cor24-basic` (#2-#7) for
+  parallel-development pipeline.
+- 2026-04-24: D1 working — first end-to-end Smalltalk message
+  send (`3 + 4` -> `7`) hosted on integer-only BASIC.
+- 2026-04-24: simplification: primitive methods bypass frame
+  activation entirely. ACTIVATE detects bodies starting with
+  opcode 13 (PRIMITIVE) and dispatches inline. D1 therefore
+  needs no frame stack at all; D2/D3 will introduce it for
+  user-defined methods.

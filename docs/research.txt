@@ -1,0 +1,820 @@
+
+
+
+
+If I were to implement an embedded (integer-only) Smalltalk, what languages could I use.  What was Smalltalk implemented in (ca 1975?).  How much of Smalltalk can be written in Smalltalk.  Some people find Smalltalk syntax hard to understand--Is there a visual progamming language approach I could adopt to hide the syntax and compose Smalltalk applications visually?
+
+I’ll treat this as a design question with historical grounding: implementation language choices for an embedded integer-only Smalltalk, what early Smalltalk was built in, the self-hosting boundary, and visual alternatives to expose the object/message model without forcing users into syntax.
+
+Thought for 5s
+Requirements restated
+You want an embedded, integer-only Smalltalk-like system: small VM, small object model, probably COR24-friendly, educational, and possibly visual so users do not have to read/write classic Smalltalk syntax.
+
+What was Smalltalk implemented in?
+Historically, the first Smalltalk evaluator was reportedly a ~1,000-line BASIC program in 1972, soon followed by a Nova assembly implementation. By the mid-1970s, Smalltalk-76 ran on the Xerox Alto with a VM/interpreter suitable for microcoding, and important graphics primitives like BitBlt were implemented in Alto microcode. 
+
+For Smalltalk-80, the model became clearer: most of the system is Smalltalk objects/classes/methods, while the machine-dependent substrate is a VM: bytecode interpreter, object memory, garbage collector/storage manager, display/input primitives, and other primitives. 
+
+What languages could you use?
+Best fits for your embedded integer-only version
+Implementation language	Fit	Why
+Rust	Excellent	Safe VM/object-memory implementation, good tests, WASM UI later, easy host tooling.
+PL/SW	Excellent for COR24 target	Matches your systems-language goal; could implement the runtime/VM on COR24.
+Forth	Very good	Natural for bytecode interpreters, threaded dispatch, bootstrap demos.
+C	Good	Classic VM choice; portable, small, predictable. Less aligned with your Rust preference.
+Pascal / p-code VM	Good for education	Nice if you want Smalltalk atop your p-code stack first.
+Assembler / as24 macro-assembler	Good for tiny primitives	Use for dispatch, object access, arithmetic, GC barriers, context switching.
+Smalltalk itself	Later	Once the kernel exists, compiler/class library/tools can increasingly move into Smalltalk.
+My recommendation:
+
+Phase 1: Rust-hosted VM + image builder.
+Phase 2: same VM model reimplemented in PL/SW or Forth for COR24.
+Phase 3: move parser/compiler/browser/classes into Smalltalk objects.
+Phase 4: optional as24 macro-assembler optimization for dispatch and primitives.
+
+How much can be written in Smalltalk?
+A lot, but not the bottom.
+
+Usually written in Smalltalk:
+
+Class library
+
+Methods
+
+Collections
+
+Browser/tools
+
+Compiler/parser, often eventually
+
+Debugger/inspector
+
+UI framework
+
+Image-level bootstrapping tools
+
+Usually not pure Smalltalk, at least initially:
+
+Object memory layout
+
+Allocation and garbage collection
+
+Bytecode interpreter or JIT
+
+Integer arithmetic primitives
+
+Display, keyboard, mouse, UART, filesystem/device I/O
+
+Image loader/saver
+
+Low-level scheduler/context representation
+
+For an embedded integer-only system, I would draw the line like this:
+
+Host / COR24 substrate
+  ├─ object memory
+  ├─ tagged small integers
+  ├─ bytecode interpreter
+  ├─ primitive table
+  ├─ simple GC
+  └─ image load/save
+
+Smalltalk image
+  ├─ Object, Class, Metaclass
+  ├─ Boolean, True, False
+  ├─ SmallInteger
+  ├─ Array, ByteArray, String/Symbol
+  ├─ Block/Context, maybe limited
+  ├─ compiler or assembler-like method builder
+  └─ browser / visual editor
+Integer-only Smalltalk design
+For COR24 or similar embedded targets, I would not start with full Smalltalk-80. Start with a Tinytalk:
+
+Object model
+Everything is an object.
+
+SmallInteger is immediate/tagged.
+
+Heap objects have:
+
+class pointer
+
+size/format
+
+indexed fields or named slots
+
+Classes are objects too, but metaclass support can be simplified at first.
+
+Message sends
+Support three message forms internally, even if users do not type them:
+
+receiver unaryMessage
+receiver keyword: arg
+receiver binaryOp arg
+But in the VM, all become:
+
+send(selector, receiver, arguments[])
+Arithmetic
+Integer-only is fine:
+
++ - * / // %
+
+comparisons
+
+bit operations
+
+shifts
+
+maybe fixed-point later
+
+Floating point can be simulated later as an object library.
+
+Blocks
+Blocks are important, but expensive. You can stage them:
+
+No closures; only simple control primitives.
+
+Non-escaping blocks.
+
+Full blocks with captured environments.
+
+Reified contexts, if you want a classic Smalltalk debugger.
+
+Visual programming approach
+Yes. Smalltalk is unusually suited to visual composition because its execution model is already:
+
+object receives message with arguments
+So you can hide syntax behind blocks/nodes/cards.
+
+Good visual model
+Represent every expression as a message tile:
+
+[account] -- receives --> [deposit:] -- argument --> [100]
+Or compactly:
+
+account
+  deposit: 100
+For cascades:
+
+account
+  deposit: 100;
+  withdraw: 25;
+  balance
+Visual form:
+
+account
+ ├─ deposit: 100
+ ├─ withdraw: 25
+ └─ balance
+UI metaphor
+Use a live object workbench:
+
+Object cards show slots and methods.
+
+Message tiles connect receiver → selector → arguments.
+
+Method editor is a tree, not text.
+
+The system can always show the equivalent Smalltalk text as an optional “source view.”
+
+Debugging is object/message animation: highlight receiver, selector lookup, method activation, return value.
+
+Prior art to look at conceptually
+Smalltalk browser / inspector / debugger: not visual syntax, but live object editing.
+
+Scratch / Etoys / Squeak lineage: tile-based, Smalltalk-adjacent educational programming.
+
+Self / Morphic: direct manipulation of live objects.
+
+Node-RED / LabVIEW: useful for visual data/message flow, though less Smalltalk-like.
+
+Best architecture for your project
+Tinytalk Source / Visual Tiles
+          │
+          ▼
+     AST / Message Tree
+          │
+          ▼
+     Bytecode Compiler
+          │
+          ▼
+      Method Objects
+          │
+          ▼
+   Embedded Smalltalk VM
+          │
+          ▼
+ COR24 / Rust host / WASM UI
+Suggested staged plan
+Rust Tinytalk VM
+
+tagged integers
+
+heap objects
+
+classes
+
+message dictionary
+
+bytecode interpreter
+
+primitive table
+
+Minimal image
+
+Object
+
+Class
+
+SmallInteger
+
+Boolean
+
+Array
+
+String/Symbol
+
+Text compiler
+
+small parser
+
+emits bytecodes
+
+enough for examples
+
+Visual composer
+
+build AST/message tree visually
+
+compile same AST as text parser
+
+COR24 backend
+
+either VM in PL/SW/Forth
+
+or bytecode interpreter in as24/HLASM-inspired macro assembler
+
+Educational browser
+
+inspect objects
+
+step bytecodes
+
+show selector lookup
+
+show stack/context
+
+show message sends as animated arrows
+
+Bottom line
+For your goals, I would implement the first version in Rust, then port the VM core to PL/SW or Forth for COR24. Keep the language message-oriented and integer-only, not full Smalltalk-80. Then build a visual message-tree editor that emits the same AST as the textual syntax. That gives you the Smalltalk object model without forcing beginners to parse Smalltalk syntax first.
+
+
+Tell me more about (a) implementing tiny/cor24 Smalltalk in tiny/cor24 BASIC. and (b) how the visual tree programming would look/work.
+
+I’ll break this into two concrete designs: first a deliberately “too small to be intimidating” BASIC-hosted Smalltalk prototype, then the visual tree editor as a real source representation rather than just a drawing layer.
+
+Thought for a couple of seconds
+A. Tiny Smalltalk implemented in tiny/COR24 BASIC
+The goal is not “fast Smalltalk.” The goal is:
+
+Use BASIC as a readable bootstrapping language to explain how Smalltalk works.
+
+Think of it as a Smalltalk bytecode VM written in BASIC, not a full Smalltalk compiler at first.
+
+1. Minimal architecture
+BASIC Program
+  ├─ object heap arrays
+  ├─ class table
+  ├─ symbol table
+  ├─ method table
+  ├─ bytecode interpreter
+  ├─ primitive routines
+  └─ tiny REPL / demo runner
+The BASIC program provides the VM substrate.
+
+The Smalltalk “image” is just data loaded into BASIC arrays.
+
+2. Represent objects with integer arrays
+Since COR24 BASIC is integer-only, everything can be encoded as integers.
+
+Example heap layout:
+
+object address = index into heap array
+
+HEAP[obj + 0] = class pointer
+HEAP[obj + 1] = size
+HEAP[obj + 2] = field 0
+HEAP[obj + 3] = field 1
+...
+Tagged small integers:
+
+even number = object pointer
+odd number  = small integer
+
+SmallInteger value N = N * 2 + 1
+Object pointer P     = P * 2
+So:
+
+0     -> object pointer 0
+2     -> object pointer 1
+21    -> small integer 10
+-3    -> small integer -2
+You can hide this with BASIC subroutines:
+
+REM ISINT(X)
+REM VALUE(X)
+REM MAKEINT(N)
+REM CLASSOF(X)
+REM FIELD(X,I)
+REM SETFIELD(X,I,V)
+3. Minimal class system
+Start with fixed built-in classes:
+
+0 Object
+1 Class
+2 SmallInteger
+3 Boolean
+4 Array
+5 String/Symbol
+6 Block / MethodContext, optional later
+A class object can hold:
+
+CLASS NAME
+SUPERCLASS
+METHOD DICTIONARY
+INSTANCE SIZE
+In tiny BASIC arrays:
+
+CLNAME(C)
+CLSUPER(C)
+CLMETH(C)     ' pointer to method dictionary
+CLSIZE(C)
+4. Method dictionary
+A method dictionary can be simple:
+
+selector id -> method id
+For a tiny system, use parallel arrays:
+
+MCLASS(I) = class id
+MSEL(I)   = selector id
+MBC(I)    = bytecode start address
+MLEN(I)   = bytecode length
+MARGS(I)  = argument count
+MTEMP(I)  = temp count
+Selector examples:
+
+1 = "+"
+2 = "-"
+3 = "<"
+4 = "print"
+5 = "ifTrue:"
+6 = "at:"
+7 = "at:put:"
+5. Bytecodes
+Keep the bytecode set very small.
+
+0 HALT
+1 PUSH_SELF
+2 PUSH_LITERAL n
+3 PUSH_TEMP n
+4 STORE_TEMP n
+5 PUSH_FIELD n
+6 STORE_FIELD n
+7 SEND selector argc
+8 RETURN_TOP
+9 POP
+10 JUMP offset
+11 JUMP_IF_FALSE offset
+12 PUSH_INT n
+13 PRIMITIVE n
+A method body such as:
+
+square
+  ^ self * self
+could compile to:
+
+PUSH_SELF
+PUSH_SELF
+SEND "*" 1
+RETURN_TOP
+6. Dispatch loop in BASIC
+Conceptually:
+
+1000 REM INTERPRETER LOOP
+1010 OP = BC(PC)
+1020 PC = PC + 1
+1030 IF OP = 0 THEN RETURN
+1040 IF OP = 1 THEN GOSUB 2000 : GOTO 1000
+1050 IF OP = 2 THEN GOSUB 2100 : GOTO 1000
+1060 IF OP = 7 THEN GOSUB 3000 : GOTO 1000
+1070 IF OP = 8 THEN GOSUB 4000 : GOTO 1000
+1080 PRINT "BAD BYTECODE "; OP
+1090 STOP
+The important educational point:
+
+The Smalltalk runtime is mostly a loop that repeatedly says:
+“fetch bytecode, do small action, continue.”
+
+7. Message send in BASIC
+Message send is the heart of Smalltalk.
+
+receiver class
+  ↓
+lookup selector in class method dictionary
+  ↓
+if not found, try superclass
+  ↓
+if found, create activation/context
+  ↓
+jump to method bytecode
+Pseudo-BASIC:
+
+3000 REM SEND
+3010 SEL = BC(PC) : PC = PC + 1
+3020 ARGCOUNT = BC(PC) : PC = PC + 1
+3030 RECEIVER = STACK(SP - ARGCOUNT)
+3040 GOSUB 3100 REM CLASSOF RECEIVER -> RCLASS
+3050 GOSUB 3200 REM LOOKUP METHOD
+3060 IF METHOD = -1 THEN PRINT "MESSAGE NOT UNDERSTOOD" : STOP
+3070 GOSUB 3300 REM ACTIVATE METHOD
+3080 RETURN
+8. Primitives
+For tiny/COR24 Smalltalk, arithmetic should not initially be Smalltalk methods. Implement them as VM primitives.
+
+Primitive 1: integer add
+Primitive 2: integer subtract
+Primitive 3: integer multiply
+Primitive 4: integer compare <
+Primitive 5: print integer
+Primitive 6: allocate object
+Primitive 7: array at:
+Primitive 8: array at:put:
+Then SmallInteger>>+ can be a method object whose body is:
+
+PRIMITIVE 1
+RETURN_TOP
+This keeps the system Smalltalk-shaped without forcing the first version to implement all arithmetic in Smalltalk.
+
+9. What would be written in BASIC vs Smalltalk?
+BASIC substrate
+object memory
+tagged integer encoding
+bytecode loop
+method lookup
+activation stack
+primitive table
+allocation
+simple GC or no GC initially
+image loader
+Smalltalk image
+Object methods
+SmallInteger methods
+Boolean methods
+Array methods
+user classes
+demo programs
+maybe compiler later
+10. Suggested tiny demo sequence
+Demo 1: arithmetic send
+3 + 4
+Visualized as:
+
+SEND selector "+"
+receiver: 3
+argument: 4
+result: 7
+Demo 2: object slots
+Counter new
+  value: 0;
+  increment;
+  increment;
+  value
+Demo 3: Boolean dispatch
+Instead of native IF, use Smalltalk objects:
+
+x < 10 ifTrue: [ x + 1 ]
+But in the first BASIC-hosted version, you can cheat and compile this to bytecode jumps.
+
+Demo 4: tiny class
+class Counter
+  value
+
+increment
+  value := value + 1
+
+value
+  ^ value
+11. Why BASIC is attractive here
+Pros:
+
+Very teachable.
+
+Fits your browser demos.
+
+Good historical flavor.
+
+Forces the VM design to stay small.
+
+Makes object memory, message send, and bytecode dispatch visible.
+
+Cons:
+
+Slow.
+
+Awkward arrays.
+
+No natural structs.
+
+GC is painful.
+
+Parser/compiler in BASIC may become tedious.
+
+Best use:
+
+BASIC should host the first explainable VM, not necessarily the final production implementation.
+
+B. Visual tree programming for Smalltalk
+Smalltalk syntax is compact but unfamiliar. The underlying model is simpler:
+
+receiver receives message with zero or more arguments
+So the visual editor should expose message trees, not arbitrary flowcharts.
+
+1. Core visual idea
+Every expression is a tree:
+
+account deposit: 100
+Visual form:
+
+Message Send
+├─ receiver: account
+├─ selector: deposit:
+└─ argument 1: 100
+Another example:
+
+3 + (4 * 5)
+Visual tree:
+
+send "+"
+├─ receiver: 3
+└─ argument:
+   send "*"
+   ├─ receiver: 4
+   └─ argument: 5
+This is much easier to explain than precedence rules.
+
+2. Visual blocks
+A Smalltalk method becomes a vertical tree:
+
+increment
+  value := value + 1.
+  ^ value
+Visual:
+
+Method: increment
+
+Sequence
+├─ Assign
+│  ├─ slot: value
+│  └─ expression:
+│     send "+"
+│     ├─ receiver: value
+│     └─ argument: 1
+└─ Return
+   └─ value
+3. Method card UI
+A class can appear as a card:
+
+┌─────────────────────────────┐
+│ Class: Counter              │
+├─────────────────────────────┤
+│ Slots                       │
+│   value                     │
+├─────────────────────────────┤
+│ Methods                     │
+│   initialize                │
+│   increment                 │
+│   value                     │
+└─────────────────────────────┘
+Clicking increment opens the visual method tree.
+
+4. Message tile UI
+Each send could be a tile:
+
+┌─────────────────────────────┐
+│ send: +                     │
+├─────────────────────────────┤
+│ receiver: [ value        ]  │
+│ arg 1:    [ 1            ]  │
+└─────────────────────────────┘
+Or more compact:
+
+[value] -- + --> [1]
+For keyword messages:
+
+array at: 3 put: 99
+Visual:
+
+send "at:put:"
+├─ receiver: array
+├─ at: 3
+└─ put: 99
+This is especially nice because Smalltalk keyword messages already name their arguments.
+
+5. Cascades
+Smalltalk cascade:
+
+pen
+  down;
+  move: 10;
+  turn: 90;
+  move: 10;
+  up
+Visual:
+
+Receiver: pen
+├─ down
+├─ move: 10
+├─ turn: 90
+├─ move: 10
+└─ up
+This would be very beginner-friendly.
+
+6. Control flow visually
+Classic Smalltalk uses messages for control flow:
+
+x < 10 ifTrue: [ x := x + 1 ]
+Visual:
+
+send "ifTrue:"
+├─ receiver:
+│  send "<"
+│  ├─ receiver: x
+│  └─ argument: 10
+└─ block:
+   Sequence
+   └─ Assign x:
+      send "+"
+      ├─ receiver: x
+      └─ argument: 1
+But for beginners, you might render it as:
+
+If
+├─ condition: x < 10
+└─ then:
+   x := x + 1
+Internally it still lowers to ifTrue:.
+
+7. Visual source format
+Do not store diagrams as pixels. Store the AST.
+
+Example JSON-like form:
+
+{
+  "type": "send",
+  "selector": "+",
+  "receiver": { "type": "var", "name": "value" },
+  "args": [
+    { "type": "int", "value": 1 }
+  ]
+}
+Or in a smaller symbolic format for COR24:
+
+(SEND "+"
+  (VAR value)
+  (INT 1))
+Pipeline:
+
+visual tiles
+  ↓
+AST/message tree
+  ↓
+bytecode compiler
+  ↓
+method object
+  ↓
+Smalltalk VM
+The visual editor and text parser should both produce the same AST.
+
+8. Dual view is important
+For teaching, always offer both:
+
+Visual tree view  ⇄  Smalltalk text view  ⇄  Bytecode view
+Example:
+
+Visual
+send "+"
+├─ receiver: value
+└─ argument: 1
+Text
+value + 1
+Bytecode
+PUSH_FIELD value
+PUSH_INT 1
+SEND "+" 1
+That would make an excellent compiler/interpreter visualization.
+
+9. Visual debugger
+When stepping the program, animate:
+
+1. highlight receiver
+2. evaluate arguments
+3. lookup selector in receiver class
+4. enter method
+5. push activation/context
+6. return result
+For example:
+
+counter increment
+Could show:
+
+counter
+  class: Counter
+  selector: increment
+  method found in: Counter
+  bytecode:
+    PUSH_FIELD value
+    PUSH_INT 1
+    SEND "+"
+    STORE_FIELD value
+    RETURN_SELF
+This directly teaches “objects + messages + late binding.”
+
+10. Good beginner visual vocabulary
+Use a small set of node types:
+
+Literal
+Variable
+Slot read
+Slot write
+Message send
+Cascade
+Sequence
+Return
+Block
+Class
+Method
+Primitive
+That is enough for a powerful first system.
+
+Combined design: BASIC-hosted Smalltalk + visual tree UI
+The most interesting architecture is:
+
+Browser UI
+  ├─ class cards
+  ├─ method tree editor
+  ├─ object inspector
+  ├─ bytecode view
+  └─ VM stepper
+
+Tiny Smalltalk compiler
+  ├─ visual AST input
+  ├─ optional text parser
+  └─ bytecode emitter
+
+COR24 BASIC VM
+  ├─ object heap arrays
+  ├─ method table
+  ├─ bytecode interpreter
+  └─ primitives
+In your ecosystem, I would probably build it as:
+
+Rust/Yew/WASM visual editor
+       ↓ emits
+Tiny Smalltalk AST
+       ↓ compiles to
+Tiny Smalltalk bytecode image
+       ↓ loaded by
+COR24 BASIC Smalltalk VM
+That gives you:
+
+BASIC as the historically flavored VM substrate.
+
+Rust/Yew as the nice educational UI.
+
+Smalltalk as the object/message teaching target.
+
+COR24 as the visible machine underneath.
+
+My recommended first milestone
+Implement only this:
+
+3 + 4
+But show all layers:
+
+Visual message tree
+  ↓
+Smalltalk source
+  ↓
+AST
+  ↓
+bytecode
+  ↓
+BASIC VM stack changes
+  ↓
+result object
+That one example is enough to prove the whole architecture.
+
+
+
+

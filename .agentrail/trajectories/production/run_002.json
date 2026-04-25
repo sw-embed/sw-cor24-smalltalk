@@ -1,0 +1,11 @@
+{
+  "task_type": "production",
+  "state": {
+    "number": 2,
+    "step": "demo-d2-counter"
+  },
+  "action": "edit vm.bas opcode 5/6/8 + ACTIVATE non-primitive path; image_d2.bas installs Counter+methods; d2_counter.bas driver; run.sh d2_counter prints 2; commit+push",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-04-24T17:50:13"
+}

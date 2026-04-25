@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 002-demo-d2-counter)_
+_Updated: 2026-04-24 (saga step 003-demo-d3-boolean)_
 
 ## What runs today
 
@@ -13,6 +13,12 @@ _Updated: 2026-04-24 (saga step 002-demo-d2-counter)_
   RETURN_TOP. Counter>>incr internally invokes `SmallInteger>>+`,
   proving nested message sends across user-method and primitive-
   method boundaries. Run with `./scripts/run.sh d2_counter`.
+- **Demo D3: `5 < 10 ifTrue: 42 ifFalse: 0` -> `42`** via True
+  and False objects with their own `ifTrue:ifFalse:` methods.
+  Exercises PUSH_TEMP (argument access via current-frame's saved
+  cleanup_target+1+n), `<` returning the True singleton ref (8),
+  and polymorphic dispatch on Boolean class. Run with
+  `./scripts/run.sh d3_boolean`.
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -72,12 +78,13 @@ matches whatever just shipped.
 
 ## What does not exist yet
 
-- Demo D3 (Boolean) — saga step 003. Needs PUSH_LIT, PUSH_TEMP
-  (for arg access in ifTrue:ifFalse:), JUMP, JUMP_IF_FALSE, and
-  primitive 4 (`<`). All currently stubbed in `vm.bas` returning
-  E=1 (except primitive 4, which is implemented but untested).
-- Mini source REPL.
-- A `README.md` (by convention, written after D3 ships).
+- Mini source REPL (saga step 4 in `docs/plan.md`; not yet
+  added to the agentrail saga as a separate step).
+- `PUSH_LIT`, `JUMP`, `JUMP_IF_FALSE`, `STORE_TEMP` — bytecodes
+  reserved in `docs/design.md` § 5 but not exercised by D1/D2/D3
+  and currently stubbed (return `E=1`).
+- A `README.md`. Now that D1/D2/D3 all run, the next saga step
+  (009-v0-release-notes) writes one.
 
 ## Reality check on the substrate
 
@@ -105,12 +112,17 @@ does not use `ABS`.
 
 ## Immediate next step
 
-Saga step `003-demo-d3-boolean` — implement
-`5 < 10 ifTrue: [42] ifFalse: [0]` through True/False objects.
-Needs PUSH_LIT (so True>>ifTrue:ifFalse: can return the first
-arg, False>>ifTrue:ifFalse: can return the second), PUSH_TEMP
-(arg-access path; `temp 0` and `temp 1` are arguments 0 and 1
-in this VM), and primitive 4 (`<`) returning the True/False ref.
+The three foundational demos all run. Two natural next steps,
+both already queued in the saga:
+
+- Steps 004-008 are the *parallel-development pipeline*: each
+  one unblocks once the corresponding upstream FR (BASIC issues
+  #2-#7) merges. Best to wait on those rather than block on
+  them.
+- Step 009-v0-release-notes is *not* gated on anything upstream
+  and would write the first `README.md` plus tag `v0.0.1`. This
+  is the cleanest "we are done with the v0 bootstrap" milestone
+  and a good place to pause.
 
 ## Out of scope (also see `prd.md` § 6)
 
@@ -146,3 +158,9 @@ in this VM), and primitive 4 (`<`) returning the True/False ref.
   max), RETURN_TOP that restores caller P/M/L/R/S and
   back-fills the result at the saved cleanup target. Nested
   send (`incr` calling `SmallInteger>>+`) works.
+- 2026-04-24: D3 working — Boolean dispatch via True/False
+  objects with their own `ifTrue:ifFalse:` methods. PUSH_TEMP
+  reads args via `(current frame's saved cleanup_target) + 1 +
+  n`. Block evaluation is *eager* in v0: callers compute both
+  branches and pass them as arguments; the receiver class
+  selects which one to return.

@@ -1,6 +1,6 @@
 number = 2
 slug = "demo-d2-counter"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: demo-d2-counter
 
@@ -8,5 +8,6 @@ Add demo D2: a user-defined `Counter` class with one..."""
 role = "production"
 context_files = []
 created_at = "2026-04-24T16:46:10"
+completed_at = "2026-04-24T17:50:13"
 task_type = "production"
-commits = []
+commits = ["bf0c0f34bbdc41aaa0bdbfcdfacadb3bac0da68e"]

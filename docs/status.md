@@ -1,13 +1,18 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 001-phase-1-bootstrap)_
+_Updated: 2026-04-24 (saga step 002-demo-d2-counter)_
 
 ## What runs today
 
 - **Demo D1: `3 + 4` -> `7`** via real `SmallInteger>>+` dispatch
   through `CLASSOF -> LOOKUP -> ACTIVATE -> PRIM 1`. Run with
-  `./scripts/run.sh d1_add`. This is the project's first claim
-  of being "Smalltalk".
+  `./scripts/run.sh d1_add`.
+- **Demo D2: Counter init/incr/incr/value -> `2`** via a
+  user-defined class with one instance variable. Exercises
+  PUSH_FIELD, STORE_FIELD, frame-stack push in ACTIVATE, and
+  RETURN_TOP. Counter>>incr internally invokes `SmallInteger>>+`,
+  proving nested message sends across user-method and primitive-
+  method boundaries. Run with `./scripts/run.sh d2_counter`.
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -67,12 +72,12 @@ matches whatever just shipped.
 
 ## What does not exist yet
 
-- Demos D2 (Counter) and D3 (Boolean) — saga steps 002 and 003.
-  The VM scaffolding for both is in `vm.bas` but stubs only
-  (PUSH_FIELD/STORE_FIELD/PUSH_TEMP/JUMP*/RETURN_TOP all set
-  E=1).
+- Demo D3 (Boolean) — saga step 003. Needs PUSH_LIT, PUSH_TEMP
+  (for arg access in ifTrue:ifFalse:), JUMP, JUMP_IF_FALSE, and
+  primitive 4 (`<`). All currently stubbed in `vm.bas` returning
+  E=1 (except primitive 4, which is implemented but untested).
 - Mini source REPL.
-- A `README.md` (by convention, written after D2/D3 ship).
+- A `README.md` (by convention, written after D3 ships).
 
 ## Reality check on the substrate
 
@@ -100,17 +105,12 @@ does not use `ABS`.
 
 ## Immediate next step
 
-Saga step `002-demo-d2-counter` — implement a user-defined
-`Counter` class with one instance variable and three methods.
-This requires fleshing out the currently-stubbed opcode handlers
-in `vm.bas`:
-
-- PUSH_FIELD / STORE_FIELD (instance variable access)
-- A real RETURN_TOP that pops a frame
-- Frame-stack push in SEND for non-primitive methods
-
-`vm.bas` already reserves the line ranges and address regions
-for these; only the bodies need filling in.
+Saga step `003-demo-d3-boolean` — implement
+`5 < 10 ifTrue: [42] ifFalse: [0]` through True/False objects.
+Needs PUSH_LIT (so True>>ifTrue:ifFalse: can return the first
+arg, False>>ifTrue:ifFalse: can return the second), PUSH_TEMP
+(arg-access path; `temp 0` and `temp 1` are arguments 0 and 1
+in this VM), and primitive 4 (`<`) returning the True/False ref.
 
 ## Out of scope (also see `prd.md` § 6)
 
@@ -141,3 +141,8 @@ for these; only the bodies need filling in.
   opcode 13 (PRIMITIVE) and dispatches inline. D1 therefore
   needs no frame stack at all; D2/D3 will introduce it for
   user-defined methods.
+- 2026-04-24: D2 working — Counter with PUSH_FIELD/STORE_FIELD,
+  frame stack at addresses 896..991 (5 words/frame, 19 frames
+  max), RETURN_TOP that restores caller P/M/L/R/S and
+  back-fills the result at the saved cleanup target. Nested
+  send (`incr` calling `SmallInteger>>+`) works.

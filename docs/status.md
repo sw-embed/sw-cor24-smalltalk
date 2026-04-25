@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 008-demo-d7-bounded-counter)_
+_Updated: 2026-04-25 (saga step 009-refactor-image-data)_
 
 ## What runs today
 
@@ -168,6 +168,28 @@ both already queued in the saga:
   metaclasses, image save/load, the visual tile editor.
 - Any C, Python, or Rust source in this repo.
 
+## Known wart: stale `BLOCKED until …` saga prompts
+
+Steps `010-refactor-vm-arrays`, `011-refactor-dispatch-on`,
+`012-refactor-mod-and-bits`, and `014-debug-cont-stepper` all
+have prompts that begin "BLOCKED until `sw-cor24-basic` issue
+[FR-N] … ships". Those prompts were written before any FR
+landed.
+
+All six FRs are now closed and merged on
+`sw-cor24-basic`'s `main` (commits `99412f7` FR-2, `e20cabc`
+FR-1, `f60ec3a` FR-3, `c6d3080` FR-4, `8ab3654` FR-5,
+`3f82f3b` FR-6). `agentrail` has no edit-prompt command, so
+the stale wording remains in the step record.
+
+**An agent picking up any of those steps must check
+`../sw-cor24-basic` git log first** to confirm the gating
+dependency is satisfied before treating the prompt's "BLOCKED"
+language at face value. Steps `009-refactor-image-data`,
+`013-refactor-bitwise`, and `015-v0.1-release-notes` were
+written or refreshed after the FRs landed and don't carry
+this wart.
+
 ## Decision log
 
 - 2026-04-24: project created.
@@ -215,6 +237,18 @@ both already queued in the saga:
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-25: First FR dogfooded — image loaders now use FR-2
+  (DATA/READ/RESTORE) instead of one POKE per byte. Added shared
+  helper `read_and_install_methods` at `src/vm.bas` line 10800
+  that consumes a self-describing DATA stream:
+  `<class> <selector> <byte-count> <byte0> ... <byte_n-1>`,
+  terminated by `<-1>`. Each `image_d*.bas` shrank dramatically:
+  371 lines total -> 98 lines (74% reduction). All 7 demos still
+  produce identical output (7, 2, 42, 5, REPL, 120, 5). The
+  contiguous-pool layout means method bytecode addresses are now
+  determined by DATA order, not by hand; verified that nothing
+  else in the VM cares about the exact addresses (everything
+  references methods through (class, selector) lookup).
 - 2026-04-24: D7 working — inheritance via superclass walk.
   `class_super[]` lives at scratch addresses 752..767;
   INSTALL_SINGLETONS now sets `class_super[0] = -1` so the chain

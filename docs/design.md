@@ -371,28 +371,31 @@ ranked by how much they hurt v0 specifically.
 | 13 | `PEEK`/`POKE` semantics differ above and below 1024 (word-store vs byte-MMIO). | Document the boundary; never use `PEEK`/`POKE` above 1023 from VM code. |
 | 14 | `ABS` bug (sw-cor24-basic#1). | Avoid `ABS` until fixed; v0 demos do not need it. |
 
-### 11.3 Suggested upstream feature requests (sw-cor24-basic)
+### 11.3 Upstream feature requests (sw-cor24-basic): all merged
 
-Listed in priority order for *this* project. Each would meaningfully
-shrink the v0 BASIC source or speed it up. None is a hard blocker.
+All six FRs filed during step 001 have shipped on
+`sw-cor24-basic` `main`. Status of each from this project's
+point of view:
 
-- **FR-1**: `DIM A(n)` integer arrays. Even one-dimensional, fixed
-  size. Replaces the PEEK/POKE-as-array idiom and is the single
-  largest readability win.
-- **FR-2**: `DATA` / `READ` / `RESTORE`. Lets the image live as a
-  block of integers at the bottom of the program.
-- **FR-3**: `ON expr GOTO list` and `ON expr GOSUB list`. Cuts the
-  bytecode dispatch from O(n) to O(1) and shortens the source by
-  roughly 40 lines.
-- **FR-4**: `MOD` operator. Trivial for the BASIC parser (it
-  already has `AND`/`OR` precedence) and removes the `V-(V/2)*2`
-  pattern.
-- **FR-5**: Bitwise operators or at least `SHL`/`SHR`. Unblocks
-  compact tag/format encoding for a future v1.
-- **FR-6**: `CONT` after `STOP`. Would turn the BASIC REPL into a
-  single-step Smalltalk debugger almost for free.
+- **FR-1** `DIM A(n)` integer arrays — *not yet dogfooded*
+  (saga step 010). VM still uses PEEK/POKE-as-array.
+- **FR-2** `DATA` / `READ` / `RESTORE` — **dogfooded**
+  (saga step 009, 2026-04-25). Image files dropped 371 -> 98
+  lines via the self-describing DATA stream consumed by
+  `read_and_install_methods` at `vm.bas` line 10800.
+- **FR-3** `ON expr GOTO/GOSUB` — *not yet dogfooded*
+  (saga step 011). Bytecode dispatch is still a 14-deep
+  IF-chain.
+- **FR-4** `MOD` operator — *not yet dogfooded* (saga step
+  012). `ISINT` still uses `V - (V/2)*2`.
+- **FR-5** bitwise operators — *not yet dogfooded* (saga step
+  013). `TOINT`/`MKINT`/`PADDR` still use multiply/divide.
+- **FR-6** `CONT` after `STOP` — *not yet dogfooded* (saga
+  step 014). No interactive single-stepper exists.
 
-These are tracked in `docs/plan.md` § "Upstream feature requests".
+The original "FR list filed against upstream" is preserved in
+git history (and in the `minimal-basic-with-workarounds` tag's
+annotation) for reference.
 
 ## 12. Error Codes
 

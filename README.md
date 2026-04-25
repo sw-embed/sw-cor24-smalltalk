@@ -94,20 +94,22 @@ model work end-to-end:
 | D6 | `examples/d6_fact.bas` | `120` | `5 fact` via a *recursive* `SmallInteger>>fact` whose body uses `JUMP_IF_FALSE` to skip past the recursive branch at the base case. Verified up to `10 fact = 3628800` (recursion depth 11, comfortably within the 19-frame stack). The first proof that the v0 frame stack handles non-trivial nesting. |
 | D7 | `examples/d7_bounded.bas` | `5` | `BoundedCounter` extends `Counter`, overriding `incr` to cap at 5; `init` and `value` are inherited via the superclass walk added to LOOKUP. After 6 increments from 0, the value clamps at 5 instead of reaching 6. The first proof that v0 dispatches via inheritance (the receiver's class is consulted first; misses walk `class_super[]`). |
 
-Six upstream feature requests are filed against `sw-cor24-basic`
-(issues #2-#7) for parallel development of v0.1 cleanups:
+All six upstream BASIC feature requests have shipped. v0 is in
+the middle of dogfooding them; see `docs/status.md` and
+`docs/design.md` § 11.3 for the running scoreboard.
 
-| FR | sw-cor24-basic issue | Unblocks (saga) |
+| FR | Feature | Dogfooded here? |
 |---|---|---|
-| FR-2 DATA / READ / RESTORE | sw-embed/sw-cor24-basic#2 | refactor-image-data |
-| FR-1 DIM integer arrays | sw-embed/sw-cor24-basic#3 | refactor-vm-arrays |
-| FR-3 ON expr GOTO/GOSUB | sw-embed/sw-cor24-basic#4 | refactor-dispatch-on |
-| FR-4 MOD operator | sw-embed/sw-cor24-basic#5 | refactor-mod-and-bits |
-| FR-5 Bitwise BAND/BOR/BXOR/SHL/SHR | sw-embed/sw-cor24-basic#6 | refactor-mod-and-bits |
-| FR-6 CONT after STOP | sw-embed/sw-cor24-basic#7 | debug-cont-stepper |
+| FR-1 | `DIM` arrays | not yet (saga step 010) |
+| FR-2 | `DATA` / `READ` / `RESTORE` | **yes** — image files cut from 371 to 98 lines |
+| FR-3 | `ON expr GOTO/GOSUB` | not yet (saga step 011) |
+| FR-4 | `MOD` | not yet (saga step 012) |
+| FR-5 | bitwise BAND/BOR/BXOR/SHL/SHR | not yet (saga step 013) |
+| FR-6 | `CONT` after `STOP` | not yet (saga step 014) |
 
-Each FR unblocks one independent, parallel-mergeable refactor in
-this repo. None blocks the demos that already run.
+The pre-FR snapshot is preserved at the
+[`minimal-basic-with-workarounds`](https://github.com/sw-embed/sw-cor24-smalltalk/releases/tag/minimal-basic-with-workarounds)
+tag.
 
 ## Building and running
 

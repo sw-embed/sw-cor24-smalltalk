@@ -90,6 +90,7 @@ model work end-to-end:
 | D2 | `examples/d2_counter.bas` | `2` | `Counter` class with one instance variable; user-defined methods (`init`, `incr`, `value`); nested send (`incr` calls `+`) across user/primitive method boundaries |
 | D3 | `examples/d3_boolean.bas` | `42` | `5 < 10 ifTrue: 42 ifFalse: 0` via True/False objects with their own polymorphic `ifTrue:ifFalse:` methods. No native `IF` is used to make the choice — the receiver class does. |
 | D4 | `examples/d4_max.bas` | `5` | `5 max: 3` via `SmallInteger>>max:` whose bytecode uses `JUMP_IF_FALSE` to actually skip the unselected branch — real conditional control flow inside a Smalltalk method, not D3's eager-argument cheat. |
+| D5 | `examples/d5_calc.bas` | varies | Interactive integer calculator REPL: prompts for `A`, `op`, `B`, runs `A op B` through the VM, prints the result, loops until `op = 0`. `op` is the selector id (1=+, 2=-, 3=\*, 4=<, 14=max:). The first user-facing program; uses BASIC `INPUT` since v1 has no string variables for a true source REPL. |
 
 Six upstream feature requests are filed against `sw-cor24-basic`
 (issues #2-#7) for parallel development of v0.1 cleanups:
@@ -119,6 +120,21 @@ sibling BASIC interpreter.
 ./scripts/run.sh d2_counter
 ./scripts/run.sh d3_boolean
 ./scripts/run.sh d4_max
+./scripts/run.sh d5_calc       # interactive REPL; see "Test transcripts" below
+```
+
+### Test transcripts
+
+`scripts/build.sh` looks for `tests/<demo>.in` and, if present,
+splices its contents between the trailing `RUN` and `BYE` so
+`INPUT` statements receive canned data. This is how `d5_calc`
+becomes reproducible. To run `d5_calc` *interactively*, move the
+transcript out of the way:
+
+```sh
+mv tests/d5_calc.in tests/d5_calc.in.bak
+./scripts/run.sh d5_calc       # type integers at each prompt
+mv tests/d5_calc.in.bak tests/d5_calc.in
 ```
 
 Each script writes `build/<demo>.bas` and feeds it to the

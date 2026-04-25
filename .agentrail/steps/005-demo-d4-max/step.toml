@@ -1,6 +1,6 @@
 number = 5
 slug = "demo-d4-max"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: demo-d4-max
 
@@ -9,5 +9,6 @@ Add demo D4: `5 max: 3 -> 5` via a user-defined method
 role = "production"
 context_files = []
 created_at = "2026-04-24T18:46:50"
+completed_at = "2026-04-24T18:51:27"
 task_type = "production"
-commits = []
+commits = ["8ba436f47420a4443b2e6cce47e156db726695d8"]

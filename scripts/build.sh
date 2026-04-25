@@ -20,6 +20,7 @@ case "$DEMO" in
   d2_counter)  IMG="$REPO_DIR/src/image_d2.bas" ;;
   d3_boolean)  IMG="$REPO_DIR/src/image_d3.bas" ;;
   d4_max)      IMG="$REPO_DIR/src/image_d4.bas" ;;
+  d5_calc)     IMG="$REPO_DIR/src/image_d5.bas" ;;
   *) echo "unknown demo: $DEMO" >&2 ; exit 2 ;;
 esac
 DRV="$REPO_DIR/examples/${DEMO}.bas"
@@ -43,4 +44,23 @@ mkdir -p "$REPO_DIR/build"
 # docs/architecture.md section 7. We rely on that, not on cat
 # order, for correctness.
 cat "$IMG" "$VM" "$DRV" > "$OUT"
+
+# If a test transcript exists, splice it in between the trailing
+# RUN and BYE lines so INPUT statements receive the canned data.
+# Used by interactive demos (D5 calc) and any later REPL-style
+# steps. Pure-batch demos (D1..D4) ignore this branch.
+INPUT_FILE="$REPO_DIR/tests/${DEMO}.in"
+if [ -f "$INPUT_FILE" ]; then
+  awk -v inputs="$INPUT_FILE" '
+    /^RUN$/ {
+      print
+      while ((getline line < inputs) > 0) print line
+      close(inputs)
+      next
+    }
+    { print }
+  ' "$OUT" > "$OUT.tmp" && mv "$OUT.tmp" "$OUT"
+  echo "spliced $INPUT_FILE into $OUT"
+fi
+
 echo "wrote $OUT"

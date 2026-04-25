@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-24 (saga step 005-demo-d4-max)_
+_Updated: 2026-04-24 (saga step 006-demo-d5-calc)_
 
 ## What runs today
 
@@ -26,6 +26,16 @@ _Updated: 2026-04-24 (saga step 005-demo-d4-max)_
   matters for any non-trivial Smalltalk method (recursion,
   loops, guard clauses) — D4 is the smallest demonstration that
   it works. Run with `./scripts/run.sh d4_max`.
+- **Demo D5: integer calculator REPL** -- the first interactive
+  surface. Prompts for `A`, `op`, `B`; runs `A op B` through the
+  VM; prints result; loops until `op = 0`. `op` is the raw
+  selector id (1=+, 2=-, 3=*, 4=<, 14=max:). BASIC v1 has no
+  string variables, so a true source-text REPL is impossible
+  without modifying the host -- this calculator-style front-end
+  is the closest interactive surface achievable with the current
+  BASIC. `tests/d5_calc.in` is a canned transcript; `scripts/
+  build.sh` splices it between the trailing `RUN` and `BYE` so
+  `./scripts/run.sh d5_calc` is reproducible.
 - All four substrate smoke tests in `examples/smoke/` pass under
   the sibling `pv24t`:
   - `peek_word_store.bas`: PEEK/POKE below 1024 stores full 24-bit
@@ -183,3 +193,16 @@ both already queued in the saga:
   read the operand byte then add it to P; for offsets in scratch
   RAM, PEEK returns the full signed 24-bit word, so backward
   jumps work natively without sign-extension tricks.
+- 2026-04-24: D5 working — interactive integer calculator REPL.
+  PRIM 5 (print) extended to print booleans (`TRUE`, `FALSE`)
+  and `NIL` rather than raising E=22 on a heap ref; the smallint
+  fast path is unchanged. Discovered (and fixed) a line-number
+  collision: image_d5 used line 200 (`LET B=13` for max:'s
+  install) and the original driver used 200 as its exit label
+  (`PRINT "BYE"`); BASIC's last-write-wins line storage replaced
+  the install. New rule: image files use 100..299 (or 100..499);
+  drivers must keep their exit labels at 800+ to leave room.
+  Also added a generic test-input splice mechanism in build.sh:
+  if `tests/&lt;demo&gt;.in` exists, it is automatically inserted
+  between the trailing `RUN` and `BYE` so interactive demos are
+  reproducible.

@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-25 (saga step 010-refactor-vm-arrays)_
+_Updated: 2026-04-25 (saga step 011-refactor-dispatch-on)_
 
 ## What runs today
 
@@ -237,6 +237,18 @@ this wart.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-25: FR-3 (ON expr GOTO/GOSUB) dogfooded — three
+  IF-chains in `src/vm.bas` collapsed to single-line dispatchers:
+  - main bytecode dispatch (was 14 IFs at lines 12060..12200)
+    -> two `ON GOSUB`s split at O=7 (BASIC's 80-char line limit
+    can't fit a 13-target list on one line; "ON O GOSUB
+    13100,13200,..." with 13 entries comes to ~94 chars).
+  - OP 13 PRIMITIVE handler (was 6 IFs at 14310..14380)
+    -> one `ON N GOSUB 15100,15200,...,15600` line.
+  - ACTIVATE primitive-method path (was 6 IFs at 14600..14670)
+    -> same single-line ON GOSUB.
+  Hot-path opcode dispatch now O(1) instead of O(n).
+  vm.bas:  396 -> 380 lines (-16).
 - 2026-04-25: FR-1 (DIM) dogfooded — every PEEK/POKE in the VM,
   images, and drivers replaced by indexed array access. The VM
   uses 13 single-letter arrays (`H`, `S`, `O`, `P`, `M`, `L`,

@@ -1,0 +1,1 @@
+FR-1 dogfooded: DIM replaces all PEEK/POKE in VM/images/drivers; 13 single-letter arrays; bytecode pool became O(127) with 0..127 indices replacing 512..639 addresses; 6 phases regression-tested; D1-D7 pass

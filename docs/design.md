@@ -389,9 +389,11 @@ point of view:
   (saga step 009, 2026-04-25). Image files dropped 371 -> 98
   lines via the self-describing DATA stream consumed by
   `read_and_install_methods` at `vm.bas` line 10800.
-- **FR-3** `ON expr GOTO/GOSUB` — *not yet dogfooded*
-  (saga step 011). Bytecode dispatch is still a 14-deep
-  IF-chain.
+- **FR-3** `ON expr GOTO/GOSUB` — **dogfooded**
+  (saga step 011, 2026-04-25). Bytecode dispatch is now two
+  `ON O GOSUB` lines (split at O=7 to fit 80-char limit), and
+  the primitive trampoline at OP 13 plus its sibling in
+  ACTIVATE both became single `ON N GOSUB` lines. O(1) dispatch.
 - **FR-4** `MOD` operator — *not yet dogfooded* (saga step
   012). `ISINT` still uses `V - (V/2)*2`.
 - **FR-5** bitwise operators — *not yet dogfooded* (saga step

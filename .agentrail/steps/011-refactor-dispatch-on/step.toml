@@ -1,6 +1,6 @@
 number = 11
 slug = "refactor-dispatch-on"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: refactor-dispatch-on (depends on FR-3 in sw-cor24-basic)
 

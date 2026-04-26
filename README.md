@@ -121,13 +121,17 @@ sibling BASIC interpreter.
 
 ```sh
 # Build and run any of the three demos.
-./scripts/run.sh d1_add
-./scripts/run.sh d2_counter
-./scripts/run.sh d3_boolean
-./scripts/run.sh d4_max
+# Single-file Smalltalk demos (run-st.sh):
+./scripts/run-st.sh examples/d1_add.st       # -> 7
+./scripts/run-st.sh examples/d2_counter.st   # -> 2
+./scripts/run-st.sh examples/d3_boolean.st   # -> 42
+./scripts/run-st.sh examples/d4_max.st       # -> 5
+./scripts/run-st.sh examples/d6_fact.st      # -> 120
+./scripts/run-st.sh examples/d7_bounded.st   # -> 5
+
+# Legacy .bas-driver demos (run.sh):
 ./scripts/run.sh d5_calc       # interactive REPL; see "Test transcripts" below
-./scripts/run.sh d6_fact
-./scripts/run.sh d7_bounded
+./scripts/run.sh d8_step       # stepper variant of D1; see d8 row in demos
 ```
 
 ### Test transcripts

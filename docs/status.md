@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 016-migrate-demos-to-st)_
+_Updated: 2026-04-26 (saga step 017-top-level-st)_
 
 ## What runs today
 
@@ -296,6 +296,22 @@ canonical scoreboard.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: First single-file Smalltalk demos. `tools/stc.awk`
+  extended to recognise a `main` block at end of a `.st` file
+  and emit a complete runnable `.bas` (driver stub + image +
+  method DATA + main DATA). New `scripts/run-st.sh` cats
+  compiled output with `vm.bas` and appends `RUN`/`BYE`. The
+  compiler also recognises `<ClassName> new` and inlines an
+  ALLOC sequence (PUSH_INT class-id; PUSH_INT ivar-count;
+  PRIMITIVE 6); `PRIMITIVE 6` in `vm.bas` was rewritten to
+  pop both, call ALLOC, push result. Auto-PRIMITIVE-5
+  appended after main's last value statement so the result
+  prints. Six demos now run from a single `.st` file each:
+  D1, D2, D3, D4, D6, D7. `examples/d{1,2,3,4,6,7}_*.bas`
+  driver files deleted. D5 calc (REPL `INPUT` loop) and D8
+  stepper (`J=1` flag) keep their legacy `.bas` drivers and
+  use a new `MODE=methods_only` flag on `stc.awk` (default
+  mode emits driver stub; methods_only suppresses it).
 - 2026-04-26: All seven foundational demos migrated to `.st`
   source. `src/image_d{1,2,3,4,5,6,7}.bas` deleted; the only
   remaining `.bas` source under `src/` is `vm.bas` itself.

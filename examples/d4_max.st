@@ -18,4 +18,7 @@ method max:
   if n < self
   ^ self
   ^ n
+
+main
+  5 max: 3
 end

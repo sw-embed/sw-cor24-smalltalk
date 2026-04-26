@@ -34,9 +34,12 @@ STC="$REPO_DIR/tools/stc.awk"
 
 if [ -f "$ST_SRC" ]; then
   GEN_IMG="$REPO_DIR/build/image_${DEMO}.bas"
-  "$STC" < "$ST_SRC" > "$GEN_IMG"
+  # Methods-only mode: suppress the driver stub + main DATA so a
+  # legacy .bas driver supplies the top-level (D5 calc REPL needs
+  # an INPUT loop, D8 stepper needs J=1 + custom bytecode).
+  "$STC" -v MODE=methods_only < "$ST_SRC" > "$GEN_IMG"
   IMG="$GEN_IMG"
-  echo "compiled $ST_SRC -> $GEN_IMG"
+  echo "compiled $ST_SRC -> $GEN_IMG (methods only)"
 else
   # Fallback to hand-written src/image_<demo>.bas if no .st
   # exists.  Used while migration is still in progress.

@@ -170,16 +170,67 @@ So `a + b * c` is `((a + b) * c)`, not `(a + (b * c))`.
   args declared via the `args` line; intermediate values must
   re-evaluate or use parens.
 
+## Top-level: `main` block
+
+A `.st` file may end with a `main` block containing a single
+expression (or a sequence of value statements). The compiler
+emits the main bytecode at `O(64..)`, prepends a small driver
+stub at lines 1..99 that GOSUBs the image install and dispatches
+the main bytecode, and auto-appends `PRIMITIVE 5` (print) +
+`HALT` so the last value statement's result is printed.
+
+```st
+class SmallInteger
+method +
+  primitive 1
+
+main
+  3 + 4
+end
+```
+
+Run with:
+
+```sh
+./scripts/run-st.sh examples/d1_add.st
+# -> 7
+```
+
+`run-st.sh` does:
+
+1. Compile `.st` to a complete `.bas` (driver stub + image
+   install + method DATA + main DATA).
+2. Cat the compiled output with `src/vm.bas`.
+3. Append `RUN\nBYE\n` so the BASIC interpreter executes the
+   stored program after all numbered lines (incl. vm.bas
+   helpers) are loaded.
+
+## `ClassName new` shorthand
+
+Inside a `main` (or any expression) the compiler recognises
+`<ClassName> new` as an inline ALLOC sequence:
+
+```
+PUSH_INT <class-id>
+PUSH_INT <ivar-count>      (from the class's slots declaration)
+PRIMITIVE 6                (= ALLOC)
+```
+
+`PRIMITIVE 6` (in `src/vm.bas` line 15600) pops both, calls
+`ALLOC`, and pushes the resulting tagged heap reference.
+
+Bare class names without a following `new` are an error.
+
 ## Compiler invocation
 
 ```sh
-tools/stc.awk < examples/d2_counter.st > build/image_d2.bas
+# Default: full output (driver stub + image + main DATA).
+tools/stc.awk < examples/d2_counter.st > build/d2.bas
+
+# Methods-only (legacy .bas-driver demos like D5 calc, D8 stepper).
+tools/stc.awk -v MODE=methods_only < examples/d5_calc.st > build/image.bas
 ```
 
-The output is an `image_*.bas` file in the same shape as the
-hand-written ones in `src/`: a small bootstrap header
-(GOSUB 10100, GOSUB 10700, RESTORE, GOSUB 10800, RETURN) plus
-DATA records starting at line 500.
-
-`scripts/build.sh` invokes `stc.awk` automatically when
-`examples/<demo>.st` exists.
+`scripts/run-st.sh` uses the default mode.
+`scripts/build.sh` uses `MODE=methods_only` so legacy `.bas`
+drivers can supply their own top-level bytecode.

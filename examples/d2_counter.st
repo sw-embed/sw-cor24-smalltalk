@@ -1,6 +1,6 @@
 # D2: Counter, the canonical user-defined-class demo.
-# Compiles via tools/stc.awk to a DATA-record image equivalent to
-# the hand-written src/image_d2.bas.
+# Compiles to a complete program (image + main + driver stub).
+# Run with: ./scripts/run-st.sh examples/d2_counter.st
 
 class SmallInteger
 method +
@@ -15,4 +15,7 @@ method incr
   ^ self
 method value
   ^ value
+
+main
+  Counter new init incr incr value
 end

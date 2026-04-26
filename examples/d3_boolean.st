@@ -17,4 +17,7 @@ class False
 method ifTrue:ifFalse:
   args t f
   ^ f
+
+main
+  5 < 10 ifTrue: 42 ifFalse: 0
 end

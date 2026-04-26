@@ -17,4 +17,7 @@ method fact
   if 0 < self
   ^ self * (self - 1) fact
   ^ 1
+
+main
+  5 fact
 end

@@ -21,4 +21,7 @@ method incr
   value := value + 1.
   ^ self
   ^ self
+
+main
+  BoundedCounter new init incr incr incr incr incr incr value
 end

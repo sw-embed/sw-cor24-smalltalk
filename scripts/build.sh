@@ -29,6 +29,20 @@ esac
 DRV="$REPO_DIR/examples/${DEMO}.bas"
 OUT="$REPO_DIR/build/${DEMO}.bas"
 
+# If an .st source exists for this demo, compile it instead of
+# using the hand-written src/image_<demo>.bas.  Generated images
+# go to build/ and are byte-equivalent to the hand-written ones
+# for D2 today (see docs/st-source.md).
+ST_SRC="$REPO_DIR/examples/${DEMO}.st"
+if [ -f "$ST_SRC" ]; then
+  mkdir -p "$REPO_DIR/build"
+  STC="$REPO_DIR/tools/stc.awk"
+  GEN_IMG="$REPO_DIR/build/image_${DEMO}.bas"
+  "$STC" < "$ST_SRC" > "$GEN_IMG"
+  IMG="$GEN_IMG"
+  echo "compiled $ST_SRC -> $GEN_IMG"
+fi
+
 for f in "$VM" "$IMG" "$DRV"; do
   if [ ! -f "$f" ]; then
     echo "missing source: $f" >&2

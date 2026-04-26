@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 014-debug-cont-stepper)_
+_Updated: 2026-04-26 (saga step 015-smalltalk-source-and-compiler)_
 
 ## What runs today
 
@@ -205,6 +205,12 @@ Tracking issues:
   — v1: strings + literal pool + `Transcript`.
 - [`sw-cor24-smalltalk#3`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/3)
   — Demo: `guess` (depends on v1 strings).
+- [`sw-cor24-smalltalk#5`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/5)
+  — Compiler: full Smalltalk-source -> bytecode. Partially
+  delivered by current saga steps 015 + 016 (minimal subset
+  covering D1..D7); full scope (cascades, standard precedence,
+  block literals, literal pool) extends through the v1 saga and
+  beyond.
 
 Anchor work: add `String` class, generalize `PUSH_LIT` to a typed
 literal pool, ship `Transcript show:` / `cr`, port `D5 calc` so
@@ -290,6 +296,19 @@ canonical scoreboard.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: First Smalltalk-source compiler — `tools/stc.awk`
+  reads a `.st` file and emits the same DATA-record image format
+  the VM consumes. Verified on D2 (Counter): the generated image
+  diffs against the hand-written `src/image_d2.bas` only at the
+  REM header — every byte of method bytecode is identical. New
+  files: `tools/stc.awk` (180 lines awk), `examples/d2_counter.st`
+  (12 lines Smalltalk), `docs/st-source.md` (syntax reference).
+  `scripts/build.sh` now invokes `stc` automatically when an
+  `.st` file exists for the demo. v0 syntax subset: class with
+  named slots, methods, `^ expr`, `var := expr`, `primitive N`,
+  atoms (self / int / slot), left-to-right binary sends. No
+  precedence, cascades, blocks, keyword sends, or strings yet
+  (those go in step 016 + the v1-dialect saga).
 - 2026-04-26: FR-6 (CONT after STOP) dogfooded — added a
   scalar `J` flag to the dispatch loop. When `J <> 0`, the
   loop calls `STOP` before every opcode fetch, returning to

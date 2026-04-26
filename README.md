@@ -180,6 +180,8 @@ project (out of scope here).
 - [Architecture](docs/architecture.md)
 - [Design](docs/design.md) (object encoding, bytecodes, primitives,
   BASIC v1 shortcomings catalogue)
+- [Smalltalk source format](docs/st-source.md) (`.st` syntax
+  reference for `tools/stc.awk`)
 - [Implementation Plan](docs/plan.md)
 - [Status](docs/status.md)
 - [Research Notes](docs/research.txt) (the conversation that

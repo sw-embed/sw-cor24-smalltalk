@@ -103,7 +103,7 @@ the middle of dogfooding them; see `docs/status.md` and
 | FR-1 | `DIM` arrays | **yes** — VM, images, drivers all use single-letter `DIM` arrays; zero `PEEK`/`POKE` in v0 source |
 | FR-2 | `DATA` / `READ` / `RESTORE` | **yes** — image files cut from 371 to 98 lines |
 | FR-3 | `ON expr GOTO/GOSUB` | **yes** — three IF-chain dispatchers became single-line `ON GOSUB`s; O(1) dispatch |
-| FR-4 | `MOD` | not yet (saga step 012) |
+| FR-4 | `MOD` | **yes** — `ISINT` now uses `V MOD 2` |
 | FR-5 | bitwise BAND/BOR/BXOR/SHL/SHR | not yet (saga step 013) |
 | FR-6 | `CONT` after `STOP` | not yet (saga step 014) |
 

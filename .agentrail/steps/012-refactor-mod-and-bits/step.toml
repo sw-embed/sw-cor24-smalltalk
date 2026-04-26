@@ -1,6 +1,6 @@
 number = 12
 slug = "refactor-mod-and-bits"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: refactor-mod-and-bits (depends on FR-4 + FR-5)
 

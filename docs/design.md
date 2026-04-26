@@ -394,8 +394,8 @@ point of view:
   `ON O GOSUB` lines (split at O=7 to fit 80-char limit), and
   the primitive trampoline at OP 13 plus its sibling in
   ACTIVATE both became single `ON N GOSUB` lines. O(1) dispatch.
-- **FR-4** `MOD` operator — *not yet dogfooded* (saga step
-  012). `ISINT` still uses `V - (V/2)*2`.
+- **FR-4** `MOD` operator — **dogfooded** (saga step 012,
+  2026-04-25). `ISINT` is now `T = V MOD 2`.
 - **FR-5** bitwise operators — *not yet dogfooded* (saga step
   013). `TOINT`/`MKINT`/`PADDR` still use multiply/divide.
 - **FR-6** `CONT` after `STOP` — *not yet dogfooded* (saga

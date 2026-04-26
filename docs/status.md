@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-25 (saga step 011-refactor-dispatch-on)_
+_Updated: 2026-04-25 (saga step 012-refactor-mod-and-bits)_
 
 ## What runs today
 
@@ -237,6 +237,10 @@ this wart.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-25: FR-4 (MOD) dogfooded — ISINT helper now reads
+  `T = V MOD 2` instead of `T = V - (V/2)*2`. One-line change.
+  This was originally bundled with FR-5 (bitwise) in saga step
+  012; the bitwise half is now its own step (013).
 - 2026-04-25: FR-3 (ON expr GOTO/GOSUB) dogfooded — three
   IF-chains in `src/vm.bas` collapsed to single-line dispatchers:
   - main bytecode dispatch (was 14 IFs at lines 12060..12200)

@@ -396,8 +396,8 @@ point of view:
   ACTIVATE both became single `ON N GOSUB` lines. O(1) dispatch.
 - **FR-4** `MOD` operator — **dogfooded** (saga step 012,
   2026-04-25). `ISINT` is now `T = V MOD 2`.
-- **FR-5** bitwise operators — *not yet dogfooded* (saga step
-  013). `TOINT`/`MKINT`/`PADDR` still use multiply/divide.
+- **FR-5** bitwise operators — **dogfooded** (saga step 013,
+  2026-04-26). `TOINT`, `MKINT`, `PADDR` use `SHR`/`SHL`/`BOR`.
 - **FR-6** `CONT` after `STOP` — *not yet dogfooded* (saga
   step 014). No interactive single-stepper exists.
 

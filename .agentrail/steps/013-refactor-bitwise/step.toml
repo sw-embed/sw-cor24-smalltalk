@@ -1,6 +1,6 @@
 number = 13
 slug = "refactor-bitwise"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: refactor-bitwise
 

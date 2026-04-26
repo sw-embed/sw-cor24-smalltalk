@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-25 (saga step 012-refactor-mod-and-bits)_
+_Updated: 2026-04-26 (saga step 013-refactor-bitwise)_
 
 ## What runs today
 
@@ -237,6 +237,17 @@ this wart.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: FR-5 (bitwise) dogfooded — TOINT, MKINT, PADDR
+  in `src/vm.bas` now use `SHR`/`SHL`/`BOR` instead of `*2`/`/2`
+  arithmetic:
+  - `TOINT`:  `T = V SHR 1`     (was `(V-1)/2`)
+  - `MKINT`:  `T = (V SHL 1) BOR 1`  (was `V*2 + 1`)
+  - `PADDR`:  `T = V SHR 1`     (was `V/2`)
+  ISINT was kept on `V MOD 2` from FR-4 (`V BAND 1` would also
+  work and would handle negative tagged refs slightly more
+  cleanly, but no v0 demo uses negative SmallInts).
+  Smoke test confirmed equivalent values for the cases v0
+  exercises.
 - 2026-04-25: FR-4 (MOD) dogfooded — ISINT helper now reads
   `T = V MOD 2` instead of `T = V - (V/2)*2`. One-line change.
   This was originally bundled with FR-5 (bitwise) in saga step

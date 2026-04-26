@@ -1,0 +1,1 @@
+v1.0.0 shipped; starting v1.x-demos saga for guess + fib/gcd/list + D5 rewrite

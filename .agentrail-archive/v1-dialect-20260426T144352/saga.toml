@@ -1,0 +1,6 @@
+name = "v1-dialect"
+status = "completed"
+current_step = 3
+created_at = "2026-04-26T14:00:07"
+plan_file = ".agentrail/plan.md"
+retroactive = false

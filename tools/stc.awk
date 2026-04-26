@@ -282,14 +282,13 @@ $2 == ":=" {
 
 # anything else: in main, treat as a value statement
 {
-  if (in_main) {
-    parse_expr_or_keyword(1)
-    body[body_n++] = 9          # POP (will be backpatched if last)
-    main_last_pop_pos = body_n - 1
-    next
-  }
-  print "stc: cannot compile line: " $0 > "/dev/stderr"
-  exit 1
+  # Value statement.  Compile expression, POP result.  In main,
+  # remember the position so finish_main can backpatch the trailing
+  # POP into PRIMITIVE 5 + HALT (auto-print).
+  parse_expr_or_keyword(1)
+  body[body_n++] = 9            # POP
+  if (in_main) main_last_pop_pos = body_n - 1
+  next
 }
 
 function finish_method(    i) {

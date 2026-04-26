@@ -1,0 +1,11 @@
+{
+  "task_type": "production",
+  "state": {
+    "number": 1,
+    "step": "dialect-v1-spec"
+  },
+  "action": "noted spec already committed in earlier complete",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-04-26T14:06:05"
+}

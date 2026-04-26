@@ -1,1 +1,0 @@
-v1 spec doc; placeholder marker for completion to advance cursor

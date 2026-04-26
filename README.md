@@ -93,11 +93,20 @@ model work end-to-end:
 | D5 | `examples/d5_calc.bas` | varies | Interactive integer calculator REPL: prompts for `A`, `op`, `B`, runs `A op B` through the VM, prints the result, loops until `op = 0`. `op` is the selector id (1=+, 2=-, 3=\*, 4=<, 14=max:). The first user-facing program; uses BASIC `INPUT` since v1 has no string variables for a true source REPL. |
 | D6 | `examples/d6_fact.bas` | `120` | `5 fact` via a *recursive* `SmallInteger>>fact` whose body uses `JUMP_IF_FALSE` to skip past the recursive branch at the base case. Verified up to `10 fact = 3628800` (recursion depth 11, comfortably within the 19-frame stack). The first proof that the v0 frame stack handles non-trivial nesting. |
 | D7 | `examples/d7_bounded.bas` | `5` | `BoundedCounter` extends `Counter`, overriding `incr` to cap at 5; `init` and `value` are inherited via the superclass walk added to LOOKUP. After 6 increments from 0, the value clamps at 5 instead of reaching 6. The first proof that v0 dispatches via inheritance (the receiver's class is consulted first; misses walk `class_super[]`). |
+| Hello | `examples/hello.st` | `hello, world` | First v1-dialect demo. Uses `Transcript show: 'hello, world'. Transcript cr.` with String literals from the per-image literal pool. |
 | D8 | `examples/d8_step.bas` | trace + `7` | D1's `3 + 4` with the per-opcode `STOP`/`CONT` stepper enabled (set scalar `J = 1` before invoking dispatch). `tests/d8_step.in` interleaves `PRINT P;S` and `CONT` with each STOP, producing a register trace from `P=0 S=0` through the four-opcode dispatch to the final `7`. The first interactive Smalltalk debugger v0 has had. |
 
 All six upstream BASIC feature requests have shipped and are
 fully dogfooded.  v0.1 is the milestone "Tinytalk + every BASIC
-FR adopted + first .st compiler + single-file demos."
+FR adopted + first .st compiler + single-file demos."  v1.0
+adds Strings + a literal pool + Transcript primitives so
+demos can emit human-readable text:
+
+```sh
+$ ./scripts/run-st.sh examples/hello.st
+hello, world
+```
+
 See `docs/status.md` for the running history.
 
 | FR | Feature | Dogfooded here? |

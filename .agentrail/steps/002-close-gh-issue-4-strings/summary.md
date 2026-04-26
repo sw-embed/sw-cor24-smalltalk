@@ -1,0 +1,1 @@
+v1 dialect minimum shipped: hello.st prints 'hello, world'; String class + literal pool + Transcript primitives + PUSH_LIT + 4 built-in methods auto-emitted by stc; closes sw-cor24-smalltalk#4; D1-D8 all regress-pass

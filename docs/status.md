@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 018-v0.1-release-notes — v0.1.0 tagged)_
+_Updated: 2026-04-26 (v1-dialect saga step 003 — v1.0.0 tagged)_
 
 ## What runs today
 
@@ -296,6 +296,18 @@ canonical scoreboard.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: **v1.0.0 tagged.** v1-dialect saga's deliverable.
+  Closes the web agent's blocking issue
+  (`sw-cor24-smalltalk#4`).  v1.0 vs v0.1 diff: heap String
+  class, literal pool `T(15)`, Transcript singleton, three new
+  primitives (show:, cr, printString), `PUSH_LIT n` bytecode,
+  literal records in the DATA stream, and compiler support for
+  `'string'` literals + the `Transcript` atom.  Demos can now
+  emit human-readable text instead of bare integers:
+  `hello.st -> "hello, world"`.  Saga steps 003..011 from the
+  original plan (D5 string-rewrite, guess demo, demo backlog
+  with strings) are deferred to a v1.x saga; none blocks the
+  web agent.
 - 2026-04-26: **v0.1.0 tagged.** v0-bootstrap saga's deliverable
   milestone. Diff against `minimal-basic-with-workarounds`
   (the pre-FR snapshot): every PEEK/POKE replaced with `DIM`

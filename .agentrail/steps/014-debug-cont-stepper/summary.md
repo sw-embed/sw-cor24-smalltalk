@@ -1,0 +1,1 @@
+FR-6 dogfooded: scalar J flag + STOP at line 12015 + GOTO 12015 from both dispatch tails; default J=0 preserves D1-D7 behaviour; new D8 (examples/d8_step.bas) shows D1 stepping with PRINT/CONT transcript producing 5 register snapshots and the result 7

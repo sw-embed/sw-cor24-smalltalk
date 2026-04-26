@@ -190,6 +190,59 @@ language at face value. Steps `009-refactor-image-data`,
 written or refreshed after the FRs landed and don't carry
 this wart.
 
+## Future sagas (post-v0.1)
+
+The following issues describe work that doesn't fit the
+`v0-bootstrap` saga's "Tinytalk + dogfood the BASIC FRs" charter
+and will anchor future sagas after `v0.1.0` tags.
+
+### v1-dialect saga (next)
+
+Tracking issues:
+- [`sw-cor24-smalltalk#2`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/2)
+  — Dialect roadmap (v1 strings → v7 processes).
+- [`sw-cor24-smalltalk#4`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/4)
+  — v1: strings + literal pool + `Transcript`.
+- [`sw-cor24-smalltalk#3`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/3)
+  — Demo: `guess` (depends on v1 strings).
+
+Anchor work: add `String` class, generalize `PUSH_LIT` to a typed
+literal pool, ship `Transcript show:` / `cr`, port `D5 calc` so
+output reads `3 + 4 = 7` instead of `7`. Then port `guess` to
+`.st` and ship as the first interactive game.
+
+Initial step list (sketch — to be refined when `agentrail init`
+ed):
+
+1. `dialect-v1-strings-spec` — design Symbol vs String, literal
+   pool layout, new bytecodes.
+2. `dialect-v1-strings-vm` — implement String/Symbol heap
+   format, generalize PUSH_LIT, add Transcript primitive.
+3. `dialect-v1-image-format` — extend the FR-2 DATA stream to
+   carry literal pool entries.
+4. `dialect-v1-compiler` — extend `stc` to compile string
+   literals + `Transcript show:` calls.
+5. `dialect-v1-d5-rewrite` — make D5 calc print `A op B = C`.
+6. `dialect-v1-guess-demo` — port `guess` from BASIC.
+7. `dialect-v1-release` — tag `v1.0.0`.
+
+### v0-extras saga (optional, before v1)
+
+Tracking issue:
+[`sw-cor24-smalltalk#1`](https://github.com/sw-embed/sw-cor24-smalltalk/issues/1)
+— Demo backlog (v0-feasible).
+
+Step `017-demo-backlog-v0-fib-gcd-list` lands three of these in
+the current saga (fibonacci, gcd, linked-list). The remaining
+seven (power, prime, ackermann, hanoi, stack/queue,
+state-machine, compare-mixin) could either:
+
+- ship as a standalone `v0-extras` saga between v0.1 and v1, or
+- land alongside the v1-dialect work as a richer demo gallery.
+
+No urgency — they don't block v1. The issue's checklist is the
+canonical scoreboard.
+
 ## Decision log
 
 - 2026-04-24: project created.

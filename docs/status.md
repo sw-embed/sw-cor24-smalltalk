@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 017-top-level-st)_
+_Updated: 2026-04-26 (saga step 018-v0.1-release-notes — v0.1.0 tagged)_
 
 ## What runs today
 
@@ -296,6 +296,22 @@ canonical scoreboard.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: **v0.1.0 tagged.** v0-bootstrap saga's deliverable
+  milestone. Diff against `minimal-basic-with-workarounds`
+  (the pre-FR snapshot): every PEEK/POKE replaced with `DIM`
+  arrays, every IF-chain dispatcher replaced with `ON GOSUB`,
+  ISINT uses `MOD` and TOINT/MKINT/PADDR use bitwise shifts,
+  CONT-based stepper available, image loaders use `DATA`/
+  `READ` instead of POKE-per-byte, and a host-side `.st`
+  compiler (`tools/stc.awk`) generates each demo from a
+  single Smalltalk source file. The repo's hand-assembled
+  bytecode literals are gone for D1, D2, D3, D4, D6, D7;
+  D5 calc and D8 stepper retain `.bas` drivers since their
+  REPL/stepper UX needs constructs not yet in `.st`.
+  Saga step 019-demo-backlog (fib/gcd/linked-list) marked
+  blocked and deferred to the v1-dialect saga so those demos
+  can be authored as proper Smalltalk-with-strings programs
+  rather than authored once now and rewritten later.
 - 2026-04-26: First single-file Smalltalk demos. `tools/stc.awk`
   extended to recognise a `main` block at end of a `.st` file
   and emit a complete runnable `.bas` (driver stub + image +

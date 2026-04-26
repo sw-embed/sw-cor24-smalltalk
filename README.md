@@ -95,9 +95,10 @@ model work end-to-end:
 | D7 | `examples/d7_bounded.bas` | `5` | `BoundedCounter` extends `Counter`, overriding `incr` to cap at 5; `init` and `value` are inherited via the superclass walk added to LOOKUP. After 6 increments from 0, the value clamps at 5 instead of reaching 6. The first proof that v0 dispatches via inheritance (the receiver's class is consulted first; misses walk `class_super[]`). |
 | D8 | `examples/d8_step.bas` | trace + `7` | D1's `3 + 4` with the per-opcode `STOP`/`CONT` stepper enabled (set scalar `J = 1` before invoking dispatch). `tests/d8_step.in` interleaves `PRINT P;S` and `CONT` with each STOP, producing a register trace from `P=0 S=0` through the four-opcode dispatch to the final `7`. The first interactive Smalltalk debugger v0 has had. |
 
-All six upstream BASIC feature requests have shipped. v0 is in
-the middle of dogfooding them; see `docs/status.md` and
-`docs/design.md` § 11.3 for the running scoreboard.
+All six upstream BASIC feature requests have shipped and are
+fully dogfooded.  v0.1 is the milestone "Tinytalk + every BASIC
+FR adopted + first .st compiler + single-file demos."
+See `docs/status.md` for the running history.
 
 | FR | Feature | Dogfooded here? |
 |---|---|---|

@@ -398,8 +398,12 @@ point of view:
   2026-04-25). `ISINT` is now `T = V MOD 2`.
 - **FR-5** bitwise operators — **dogfooded** (saga step 013,
   2026-04-26). `TOINT`, `MKINT`, `PADDR` use `SHR`/`SHL`/`BOR`.
-- **FR-6** `CONT` after `STOP` — *not yet dogfooded* (saga
-  step 014). No interactive single-stepper exists.
+- **FR-6** `CONT` after `STOP` — **dogfooded** (saga step 014,
+  2026-04-26). Dispatch loop has a scalar `J` flag; `J<>0`
+  STOPs before each opcode fetch, letting the user inspect VM
+  state at the BASIC prompt and `CONT` to advance. See
+  `examples/d8_step.bas` and `tests/d8_step.in` for a worked
+  example.
 
 The original "FR list filed against upstream" is preserved in
 git history (and in the `minimal-basic-with-workarounds` tag's

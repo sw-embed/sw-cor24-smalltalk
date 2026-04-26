@@ -23,6 +23,7 @@ case "$DEMO" in
   d5_calc)     IMG="$REPO_DIR/src/image_d5.bas" ;;
   d6_fact)     IMG="$REPO_DIR/src/image_d6.bas" ;;
   d7_bounded)  IMG="$REPO_DIR/src/image_d7.bas" ;;
+  d8_step)     IMG="$REPO_DIR/src/image_d1.bas" ;;
   *) echo "unknown demo: $DEMO" >&2 ; exit 2 ;;
 esac
 DRV="$REPO_DIR/examples/${DEMO}.bas"

@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 013-refactor-bitwise)_
+_Updated: 2026-04-26 (saga step 014-debug-cont-stepper)_
 
 ## What runs today
 
@@ -237,6 +237,20 @@ this wart.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: FR-6 (CONT after STOP) dogfooded — added a
+  scalar `J` flag to the dispatch loop. When `J <> 0`, the
+  loop calls `STOP` before every opcode fetch, returning to
+  the BASIC immediate prompt. The user can `PRINT P,M,L,R,S,F`
+  (or any DIM array slot) to inspect VM state, then `CONT` to
+  advance one opcode. Default behaviour (J=0) is unchanged for
+  D1-D7. New `examples/d8_step.bas` is D1's `3 + 4` with
+  stepping enabled; `tests/d8_step.in` provides a canned
+  PRINT/CONT transcript that captures the state at every step:
+    STEP P=0 S=0      (before first opcode)
+    STEP P=2 S=1      (after PUSH_INT 3)
+    STEP P=4 S=2      (after PUSH_INT 4)
+    STEP P=7 S=1      (after SEND '+' produced 7)
+    STEP P=9 S=1      (after PRIMITIVE 5 printed 7)
 - 2026-04-26: FR-5 (bitwise) dogfooded — TOINT, MKINT, PADDR
   in `src/vm.bas` now use `SHR`/`SHL`/`BOR` instead of `*2`/`/2`
   arithmetic:

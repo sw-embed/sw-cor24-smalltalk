@@ -1,6 +1,6 @@
 number = 14
 slug = "debug-cont-stepper"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: debug-cont-stepper (depends on FR-6 in sw-cor24-basic)
 

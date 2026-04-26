@@ -1,0 +1,1 @@
+FR-5 dogfooded: TOINT/MKINT/PADDR use SHR/SHL/BOR; ISINT stays on MOD from FR-4; smoke-tested 6 tag-arith cases match arithmetic forms; D1-D7 pass

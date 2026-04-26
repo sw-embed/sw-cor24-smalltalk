@@ -93,6 +93,7 @@ model work end-to-end:
 | D5 | `examples/d5_calc.bas` | varies | Interactive integer calculator REPL: prompts for `A`, `op`, `B`, runs `A op B` through the VM, prints the result, loops until `op = 0`. `op` is the selector id (1=+, 2=-, 3=\*, 4=<, 14=max:). The first user-facing program; uses BASIC `INPUT` since v1 has no string variables for a true source REPL. |
 | D6 | `examples/d6_fact.bas` | `120` | `5 fact` via a *recursive* `SmallInteger>>fact` whose body uses `JUMP_IF_FALSE` to skip past the recursive branch at the base case. Verified up to `10 fact = 3628800` (recursion depth 11, comfortably within the 19-frame stack). The first proof that the v0 frame stack handles non-trivial nesting. |
 | D7 | `examples/d7_bounded.bas` | `5` | `BoundedCounter` extends `Counter`, overriding `incr` to cap at 5; `init` and `value` are inherited via the superclass walk added to LOOKUP. After 6 increments from 0, the value clamps at 5 instead of reaching 6. The first proof that v0 dispatches via inheritance (the receiver's class is consulted first; misses walk `class_super[]`). |
+| D8 | `examples/d8_step.bas` | trace + `7` | D1's `3 + 4` with the per-opcode `STOP`/`CONT` stepper enabled (set scalar `J = 1` before invoking dispatch). `tests/d8_step.in` interleaves `PRINT P;S` and `CONT` with each STOP, producing a register trace from `P=0 S=0` through the four-opcode dispatch to the final `7`. The first interactive Smalltalk debugger v0 has had. |
 
 All six upstream BASIC feature requests have shipped. v0 is in
 the middle of dogfooding them; see `docs/status.md` and
@@ -105,7 +106,7 @@ the middle of dogfooding them; see `docs/status.md` and
 | FR-3 | `ON expr GOTO/GOSUB` | **yes** — three IF-chain dispatchers became single-line `ON GOSUB`s; O(1) dispatch |
 | FR-4 | `MOD` | **yes** — `ISINT` now uses `V MOD 2` |
 | FR-5 | bitwise BAND/BOR/BXOR/SHL/SHR | **yes** — `TOINT`/`MKINT`/`PADDR` use `SHR`/`SHL`/`BOR` |
-| FR-6 | `CONT` after `STOP` | not yet (saga step 014) |
+| FR-6 | `CONT` after `STOP` | **yes** — interactive single-stepper via scalar `J` flag; see `examples/d8_step.bas` |
 
 The pre-FR snapshot is preserved at the
 [`minimal-basic-with-workarounds`](https://github.com/sw-embed/sw-cor24-smalltalk/releases/tag/minimal-basic-with-workarounds)

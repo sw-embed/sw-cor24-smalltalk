@@ -1,0 +1,1 @@
+FR-3 dogfooded: 3 IF-chain dispatchers replaced by ON GOSUB; main dispatch split across 2 lines (O=7 boundary) due to 80-char limit; primitive trampoline at OP 13 and at ACTIVATE both single-line; -16 LOC; D1-D7 pass

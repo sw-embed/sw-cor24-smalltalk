@@ -1,1 +1,0 @@
-Single-file .st demos: 6 demos (D1-D4,D6,D7) run via run-st.sh from one .st each; main block + ClassName-new + keyword sends + driver stub generation; PRIM 6 rewired to pop class-id+ivar-count and ALLOC; legacy MODE=methods_only path for D5/D8

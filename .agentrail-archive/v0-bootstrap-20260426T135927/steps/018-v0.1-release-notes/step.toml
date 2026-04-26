@@ -1,0 +1,13 @@
+number = 18
+slug = "v0.1-release-notes"
+status = "completed"
+description = """
+# Step: v0.1-release-notes
+
+Final step of the `v0-bootstrap` saga. Run AFTER ..."""
+role = "production"
+context_files = []
+created_at = "2026-04-25T09:43:23"
+completed_at = "2026-04-26T13:54:16"
+task_type = "meta"
+commits = ["097d9871a2b39f463853ee1ffc3d0630acf843fb"]

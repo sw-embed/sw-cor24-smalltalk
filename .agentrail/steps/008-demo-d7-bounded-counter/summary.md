@@ -1,1 +1,0 @@
-D7 BoundedCounter -> 5 via inheritance; superclass walk in LOOKUP; class_super[] at 752..767; init/value inherited from Counter, incr override caps at 5; D1-D6 regress; latent T-vs-Q bug fixed; driver line-collision class extended (END at line 99 not 800)

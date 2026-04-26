@@ -1,1 +1,0 @@
-BLOCKED: Demo backlog (fib/gcd/linked-list) deferred to v1-dialect saga; will be authored as proper Smalltalk-with-strings demos rather than re-authoring later. Web agent unblock priority is sw-cor24-smalltalk#4 (v1 strings).

@@ -1,1 +1,0 @@
-All 7 demos migrated to .st; src/image_d*.bas deleted; vm.bas is the only .bas left in src/; compiler extensions: args, class extends, if-guard JUMP_IF_FALSE, paren+unary expressions, DATA chunking; D6 fact and D7 BoundedCounter both compile and produce hand-written-equivalent bytecode

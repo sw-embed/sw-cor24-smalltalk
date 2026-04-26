@@ -1,1 +1,0 @@
-D4 5 max: 3 -> 5 via SmallInt>>max: with real JUMP_IF_FALSE control flow; no eager-arg cheat; both branches verified (5 max:3 and 3 max:5); D1/D2/D3 regress

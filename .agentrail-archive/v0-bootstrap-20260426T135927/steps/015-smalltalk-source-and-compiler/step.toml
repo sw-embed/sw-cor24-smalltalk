@@ -1,0 +1,13 @@
+number = 15
+slug = "smalltalk-source-and-compiler"
+status = "completed"
+description = """
+# Step: smalltalk-source-and-compiler
+
+Define a minimal `.st` source format f..."""
+role = "production"
+context_files = []
+created_at = "2026-04-25T22:11:02"
+completed_at = "2026-04-26T08:59:39"
+task_type = "production"
+commits = ["29369623db3dd66757fd44f1fe660ee11c451d2f"]

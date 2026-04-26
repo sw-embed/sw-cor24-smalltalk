@@ -1,0 +1,1 @@
+FR-2 dogfooded: image_d*.bas all use DATA/READ via shared read_and_install_methods at vm.bas:10800; image total 371->98 lines (-74%); D1-D7 regress identical output

@@ -1,0 +1,11 @@
+{
+  "task_type": "meta",
+  "state": {
+    "number": 18,
+    "step": "v0.1-release-notes"
+  },
+  "action": "skipped step 019 demo-backlog (deferred to v1-dialect saga); reorder release-notes to position 18; updated README + status.md; tagged v0.1.0 with full delta-from-baseline annotation; pushed tag",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-04-26T13:54:16"
+}

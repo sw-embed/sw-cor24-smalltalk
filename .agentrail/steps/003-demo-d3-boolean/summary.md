@@ -1,1 +1,0 @@
-D3 5<10 ifTrue:42 ifFalse:0 prints 42 via True/False objects with their own ifTrue:ifFalse: methods; PUSH_TEMP wired for arg access; D1+D2 regress; all three v0 demos pass

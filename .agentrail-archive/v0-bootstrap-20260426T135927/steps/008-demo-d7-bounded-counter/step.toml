@@ -1,0 +1,13 @@
+number = 8
+slug = "demo-d7-bounded-counter"
+status = "completed"
+description = """
+# Step: demo-d7-bounded-counter
+
+Add inheritance to the v0 VM and demonstrate..."""
+role = "production"
+context_files = []
+created_at = "2026-04-24T20:32:30"
+completed_at = "2026-04-25T09:25:05"
+task_type = "production"
+commits = ["83aebdf767f1accc88b78cd9f37c8a7fe909d3aa"]

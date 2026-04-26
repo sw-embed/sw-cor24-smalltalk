@@ -153,6 +153,31 @@ needed.
 
 So `a + b * c` is `((a + b) * c)`, not `(a + (b * c))`.
 
+## v1 dialect additions (in flight, issue #4)
+
+- **String literal**: `'hello'` — single-quoted byte sequence.
+  Doubled quote `''` for embedded literal quote. Compiles to
+  `PUSH_LIT n` where `n` is the literal-pool slot the compiler
+  assigned.
+- **Transcript** is a known class name; usable as receiver in
+  expressions like `Transcript show: 'hi'`.
+- **printString** on SmallInteger: `7 printString` returns a
+  String. Useful for `Transcript show: x printString`.
+
+These let demos emit text:
+
+```st
+class SmallInteger
+method +
+  primitive 1
+
+main
+  Transcript show: 'sum is '.
+  Transcript show: (3 + 4) printString.
+  Transcript cr
+end
+```
+
 ## What is *not* in v0 syntax
 
 - Keyword messages **inside method bodies** (`x at: i put: v`,

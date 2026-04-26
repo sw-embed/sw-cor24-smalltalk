@@ -409,6 +409,66 @@ The original "FR list filed against upstream" is preserved in
 git history (and in the `minimal-basic-with-workarounds` tag's
 annotation) for reference.
 
+## 11.4 v1 dialect additions (in flight)
+
+Tracks `sw-cor24-smalltalk#4`. Minimum viable v1 surface:
+
+### String class
+
+- Class id `12`. Selector ids: `printString`=18, `show:`=16,
+  `cr`=17, `,`=19.
+- Heap layout (byte-per-word for v0-style simplicity):
+  ```
+  H(addr+0) = 12       class id
+  H(addr+1) = N        byte length
+  H(addr+2) = 1        format (1 = byte content)
+  H(addr+3..addr+3+N-1) = bytes, one per word
+  ```
+- Trade-off: 4x memory waste vs packed (4 bytes/word). Heap
+  is 512 words, so longest String fits ~509 chars byte-per-word
+  vs ~2000 packed. v1 demos top out around 80 chars; byte-per-
+  word stays for readability.
+
+### Literal pool
+
+- DIM `T(15)` array (16 slots, mnemonic: T = "tagged
+  literals") added to INSTALL_SINGLETONS DIM block.
+- New bytecode `PUSH_LIT n` (opcode 2, was stubbed): emits
+  `V = T(n)` and pushes V onto eval stack.
+- Image-loader extension: literal records in DATA stream
+  precede method records. Format:
+  `<sentinel-1> <kind> <slot> <count> <bytes...>`
+  where kind=0 means a String literal at slot n with N raw
+  bytes. Reader allocates the heap String and stores tagged ref
+  in T(slot).
+
+### Primitives
+
+| # | Selector | Effect |
+|---|---|---|
+| 7 | `Transcript show:` | pop receiver (Transcript), pop arg (String tagged ref), walk bytes, putc each, push Transcript back |
+| 8 | `Transcript cr` | pop receiver, putc 10, push back |
+| 9 | `SmallInteger>>printString` | pop SmallInt, decode, format decimal into a fresh heap String, push tagged ref |
+
+`Transcript` is a class with no slots, allocated as a singleton
+at heap addr 12 (currently the "empty Array placeholder"; that
+slot is repurposed for v1).
+
+### Compiler extensions
+
+`tools/stc.awk`:
+
+- Tokenize `'string'` (single-quoted; doubled `''` for embedded
+  quote, defer if not needed by demos).
+- Each string literal goes into the literal pool; tracked by
+  index. Emit `PUSH_LIT n`.
+- Emit literal records into the DATA stream before the method
+  records.
+- Method-body keyword sends (e.g., `Transcript show: 'x'`):
+  already supported via `parse_expr_or_keyword` from step 017.
+- Cascades (`a; b; c`): defer if not needed for the minimum
+  demo.
+
 ## 12. Error Codes
 
 We piggy-back on BASIC v1's error code table where possible:

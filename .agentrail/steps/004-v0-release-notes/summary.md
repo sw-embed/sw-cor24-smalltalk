@@ -1,1 +1,0 @@
-v0.0.1 tagged: README.md written, all 3 demos pass (D1=7,D2=2,D3=42); 5 saga steps remain blocked on upstream FRs in sw-cor24-basic

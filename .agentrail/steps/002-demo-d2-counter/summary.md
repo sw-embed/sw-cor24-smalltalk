@@ -1,1 +1,0 @@
-D2 Counter init/incr/incr/value prints 2; PUSH_FIELD/STORE_FIELD/RETURN_TOP wired; frame stack at 896..991; nested SEND (incr -> SmallInt+) works; D1 regression passes

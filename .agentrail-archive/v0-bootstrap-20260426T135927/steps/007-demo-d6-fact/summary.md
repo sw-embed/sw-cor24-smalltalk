@@ -1,0 +1,1 @@
+D6 5 fact -> 120 via recursive SmallInt>>fact; JUMP_IF_FALSE base case; verified up to 10 fact=3628800 (depth-11 recursion); D1-D5 regress

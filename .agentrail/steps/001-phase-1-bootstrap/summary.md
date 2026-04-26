@@ -1,1 +1,0 @@
-Bootstrap v0: D1 (3+4) end-to-end via real message dispatch; 6 upstream FRs filed for parallel BASIC work

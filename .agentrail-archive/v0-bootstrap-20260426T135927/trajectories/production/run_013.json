@@ -1,0 +1,11 @@
+{
+  "task_type": "production",
+  "state": {
+    "number": 14,
+    "step": "debug-cont-stepper"
+  },
+  "action": "smoke test STOP/CONT confirms variables persist; vm.bas insert IF J<>0 THEN STOP and redirect both GOTO targets; D8 demo + transcript; build.sh case; updated docs; commit+push",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-04-26T07:46:03"
+}

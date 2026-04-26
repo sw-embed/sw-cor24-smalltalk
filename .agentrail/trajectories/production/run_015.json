@@ -1,0 +1,11 @@
+{
+  "task_type": "production",
+  "state": {
+    "number": 16,
+    "step": "migrate-demos-to-st"
+  },
+  "action": "extend stc.awk with parse_expr/parse_unary/parse_atom recursive descent for parens+unary; add args directive; add class extends with slot inheritance + class_super emit; add if-guard with JUMP_IF_FALSE backpatch; add DATA chunking for long records; write 6 new .st files; rewire build.sh to prefer .st; delete 7 hand-written image files; doc EBNF + sections",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-04-26T11:50:02"
+}

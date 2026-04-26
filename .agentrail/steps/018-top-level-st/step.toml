@@ -1,0 +1,12 @@
+number = 18
+slug = "top-level-st"
+status = "pending"
+description = """
+# Step: top-level-st
+
+Add `main` blocks to the `.st` source format so a compl..."""
+role = "production"
+context_files = []
+created_at = "2026-04-26T11:52:41"
+task_type = "production"
+commits = []

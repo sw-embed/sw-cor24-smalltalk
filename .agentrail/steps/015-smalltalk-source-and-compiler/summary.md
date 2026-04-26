@@ -1,0 +1,1 @@
+First Smalltalk source compiler: tools/stc.awk; D2 generates byte-identical image from examples/d2_counter.st (only REM header differs); v0 syntax: class+slots, methods, primitive, ^expr, var:=expr, atoms (self/int/slot), L-to-R binary sends; build.sh auto-invokes stc when .st exists

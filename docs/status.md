@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-26 (saga step 015-smalltalk-source-and-compiler)_
+_Updated: 2026-04-26 (saga step 016-migrate-demos-to-st)_
 
 ## What runs today
 
@@ -296,6 +296,34 @@ canonical scoreboard.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-26: All seven foundational demos migrated to `.st`
+  source. `src/image_d{1,2,3,4,5,6,7}.bas` deleted; the only
+  remaining `.bas` source under `src/` is `vm.bas` itself.
+  `examples/d*.st` is now the canonical place where Smalltalk
+  text lives in the repo.
+  Compiler extensions in `tools/stc.awk` for this step:
+  - `args A B ...` declares method arguments. Atom resolution
+    looks up arg names before slot names; both use `PUSH_TEMP`
+    or `PUSH_FIELD` accordingly.
+  - `class CHILD extends PARENT` inherits parent's slot list
+    and emits `LET K(child) = parent` into the image header.
+  - `if EXPR` guards the next `^` statement with
+    `JUMP_IF_FALSE`, backpatching the offset when the `^`
+    fires. Multiple statements between `if` and `^` all become
+    part of the guarded block; this is what D7
+    `BoundedCounter>>incr` uses.
+  - Atom precedence: paren-grouped expressions and unary
+    sends. `(self - 1) fact` now parses as expected
+    (binary inside parens, then unary `fact`). Required for
+    D6 fact's `self * (self - 1) fact` recursive expression.
+  - DATA-line chunking: long method bodies (D6 fact at 25
+    bytes, D7 incr at 22 bytes) get split across multiple
+    DATA lines so each stays under BASIC's 80-char input
+    limit. `read_and_install_methods` (vm.bas:10800) walks
+    DATA in source order regardless of line boundaries, so
+    no VM change.
+  D8 stepper reuses D1's source (build.sh maps `d8_step` to
+  `examples/d1_add.st`).
 - 2026-04-26: First Smalltalk-source compiler — `tools/stc.awk`
   reads a `.st` file and emits the same DATA-record image format
   the VM consumes. Verified on D2 (Counter): the generated image

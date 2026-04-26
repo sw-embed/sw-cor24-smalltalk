@@ -16,26 +16,62 @@ compiler's job is methods only.
 ## EBNF (informal)
 
 ```
-program     = { class } [ "end" ] .
-class       = "class" classname [ "slots" varname { varname } ]
-              { method } .
-method      = "method" selector ( body | primdir ) .
-primdir     = "primitive" integer .
-body        = { statement } .
-statement   = ( "^" expr | varname ":=" expr ) [ "." ] .
-expr        = atom { binop atom } .
-atom        = "self" | integer | varname .
-binop       = "+" | "-" | "*" | "<" | "=" .
-classname   = identifier .  (* must be in the compiler's class table *)
-selector    = "+" | "-" | "*" | "<" | "=" |
-              identifier .  (* must be in the compiler's selector table *)
-varname     = identifier .  (* slot of the enclosing class *)
-integer     = ["-"] digit { digit } .
-identifier  = letter { letter | digit } .
+program    = { class } [ "end" ] .
+class      = "class" classname [ "extends" parentname ]
+             [ "slots" varname { varname } ]
+             { method } .
+method     = "method" selector
+             [ "args" argname { argname } ]
+             ( body | primdir ) .
+primdir    = "primitive" integer .
+body       = { statement } .
+statement  = ( "^" expr
+             | varname ":=" expr
+             | "if" expr ) [ "." ] .
+expr       = unary { binop unary } .
+unary      = atom { unaryid } .
+atom       = "self" | integer | name | "(" expr ")" .
+binop      = "+" | "-" | "*" | "<" | "=" .
+unaryid    = identifier in selector table that is not a binop
+             and contains no ":" (i.e. not a keyword) .
+name       = argname | varname .
+classname  = identifier .  (* must be in compiler's class table *)
+parentname = classname .
+selector   = identifier (binary | unary | keyword form, must be
+                         in compiler's selector table) .
+argname    = identifier .  (* declared via 'args' line *)
+varname    = identifier .  (* slot of the enclosing class *)
+integer    = ["-"] digit { digit } .
+identifier = letter { letter | digit } .
 ```
 
 Comments: `#` starts a line comment to end of line. Periods
-(`.`) and tabs are stripped.
+(`.`) and tabs are stripped. Parens are tokenised as separate
+atoms.
+
+## Statement: `if EXPR`
+
+`if EXPR` does not branch by itself. It compiles the condition
+and emits `JUMP_IF_FALSE 0`, recording the offset position. The
+**next** `^` statement triggers backpatch: the JUMP_IF_FALSE
+offset becomes "skip past the bytecode of the next return". Any
+non-return statements between `if` and the first `^` (e.g.
+assignments) become part of the guarded block. After the `^`
+fires, control falls through to whatever comes next.
+
+This is the v0 lowering of Smalltalk's `cond ifTrue: [...]
+ifFalse: [...]` when both branches end in `^`. See `examples/
+d4_max.st` and `examples/d6_fact.st`.
+
+## Inheritance: `class CHILD extends PARENT`
+
+The compiler:
+1. Looks up `PARENT`'s slot list and copies it to `CHILD`'s
+   slot table (so slot offsets stay stable).
+2. Records the relationship as a `LET K(child_id) = parent_id`
+   line in the generated image header. At image-load time, this
+   sets `class_super[child]` so the VM's superclass walk in
+   LOOKUP can resolve inherited methods.
 
 ## Selector and class id tables
 
@@ -119,17 +155,20 @@ So `a + b * c` is `((a + b) * c)`, not `(a + (b * c))`.
 
 ## What is *not* in v0 syntax
 
-- Keyword messages with multiple parts (`x at: i put: v`).
-  Single-keyword sends like `5 max: 3` need step 016's
-  expansion; `ifTrue:ifFalse:` likewise.
-- Unary message sends (`x reverse`, `x squared`). The driver-
-  level handling of demo top-levels still uses BASIC POKE.
+- Keyword messages **inside method bodies** (`x at: i put: v`,
+  `x ifTrue: y ifFalse: z`). Drivers can issue keyword sends
+  via hand-assembled `SEND <selector-id> <argc>` bytecode (D3,
+  D4, D5, D7 drivers do this); inside a method body, the
+  workaround is the `if EXPR` lowering for the
+  `ifTrue:ifFalse:` shape.
 - Cascades (`a; b; c`).
-- Block literals (`[ ... ]`). Block-shaped control flow still
-  has to lower to `JUMP_IF_FALSE` (D4-style) which the
-  compiler doesn't yet emit.
+- Block literals (`[ ... ]`). Block-shaped control flow lowers
+  to the `if` directive (which emits `JUMP_IF_FALSE`).
 - String literals. Coming in v1 dialect (issue #4).
 - Class methods (`Counter class>>new`). v0 has no metaclasses.
+- Local temp variables inside methods. Temps are limited to
+  args declared via the `args` line; intermediate values must
+  re-evaluate or use parens.
 
 ## Compiler invocation
 

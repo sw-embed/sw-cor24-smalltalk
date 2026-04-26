@@ -14,33 +14,42 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 VM="$REPO_DIR/src/vm.bas"
-IMG="$REPO_DIR/src/image_${DEMO#d?_}.bas"
-case "$DEMO" in
-  d1_add)      IMG="$REPO_DIR/src/image_d1.bas" ;;
-  d2_counter)  IMG="$REPO_DIR/src/image_d2.bas" ;;
-  d3_boolean)  IMG="$REPO_DIR/src/image_d3.bas" ;;
-  d4_max)      IMG="$REPO_DIR/src/image_d4.bas" ;;
-  d5_calc)     IMG="$REPO_DIR/src/image_d5.bas" ;;
-  d6_fact)     IMG="$REPO_DIR/src/image_d6.bas" ;;
-  d7_bounded)  IMG="$REPO_DIR/src/image_d7.bas" ;;
-  d8_step)     IMG="$REPO_DIR/src/image_d1.bas" ;;
-  *) echo "unknown demo: $DEMO" >&2 ; exit 2 ;;
-esac
 DRV="$REPO_DIR/examples/${DEMO}.bas"
 OUT="$REPO_DIR/build/${DEMO}.bas"
 
-# If an .st source exists for this demo, compile it instead of
-# using the hand-written src/image_<demo>.bas.  Generated images
-# go to build/ and are byte-equivalent to the hand-written ones
-# for D2 today (see docs/st-source.md).
-ST_SRC="$REPO_DIR/examples/${DEMO}.st"
+# Map demo name to its .st source.  Most demos use their own
+# examples/<demo>.st; d8_step (the stepper variant) reuses
+# d1_add.st since they share the same SmallInt>>+ install.
+case "$DEMO" in
+  d8_step)
+    ST_SRC="$REPO_DIR/examples/d1_add.st"
+    ;;
+  *)
+    ST_SRC="$REPO_DIR/examples/${DEMO}.st"
+    ;;
+esac
+
+mkdir -p "$REPO_DIR/build"
+STC="$REPO_DIR/tools/stc.awk"
+
 if [ -f "$ST_SRC" ]; then
-  mkdir -p "$REPO_DIR/build"
-  STC="$REPO_DIR/tools/stc.awk"
   GEN_IMG="$REPO_DIR/build/image_${DEMO}.bas"
   "$STC" < "$ST_SRC" > "$GEN_IMG"
   IMG="$GEN_IMG"
   echo "compiled $ST_SRC -> $GEN_IMG"
+else
+  # Fallback to hand-written src/image_<demo>.bas if no .st
+  # exists.  Used while migration is still in progress.
+  case "$DEMO" in
+    d1_add)      IMG="$REPO_DIR/src/image_d1.bas" ;;
+    d2_counter)  IMG="$REPO_DIR/src/image_d2.bas" ;;
+    d3_boolean)  IMG="$REPO_DIR/src/image_d3.bas" ;;
+    d4_max)      IMG="$REPO_DIR/src/image_d4.bas" ;;
+    d5_calc)     IMG="$REPO_DIR/src/image_d5.bas" ;;
+    d6_fact)     IMG="$REPO_DIR/src/image_d6.bas" ;;
+    d7_bounded)  IMG="$REPO_DIR/src/image_d7.bas" ;;
+    *) echo "unknown demo: $DEMO" >&2 ; exit 2 ;;
+  esac
 fi
 
 for f in "$VM" "$IMG" "$DRV"; do

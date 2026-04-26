@@ -1,0 +1,1 @@
+FR-4 dogfooded: ISINT uses V MOD 2 instead of V-(V/2)*2; D1-D7 pass

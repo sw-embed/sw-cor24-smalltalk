@@ -1,0 +1,12 @@
+number = 16
+slug = "migrate-demos-to-st"
+status = "pending"
+description = """
+# Step: migrate-demos-to-st
+
+After step 015 ships the `.st` compiler proving ..."""
+role = "production"
+context_files = []
+created_at = "2026-04-25T22:11:02"
+task_type = "production"
+commits = []

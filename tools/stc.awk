@@ -64,6 +64,10 @@ BEGIN {
   sel["new"]              = 13
   sel["max:"]             = 14
   sel["fact"]             = 15
+  sel["show:"]            = 16
+  sel["cr"]               = 17
+  sel["printString"]      = 18
+  sel[","]                = 19
 
   is_binary["+"] = 1
   is_binary["-"] = 1
@@ -83,6 +87,8 @@ BEGIN {
   cls["Block"]             = 9
   cls["Counter"]           = 10
   cls["BoundedCounter"]    = 11
+  cls["String"]            = 12
+  cls["Transcript"]        = 13
 
   # Default ivar counts for built-in classes (zero unless user
   # redeclares with slots).  Counter and BoundedCounter get
@@ -100,11 +106,43 @@ BEGIN {
   in_main = 0
   main_n = 0
   main_last_pop_pos = -1
+  # Literal pool slot 0 is reserved for the Transcript singleton
+  # (heap addr 12 -> tagged ref 24, set up by INSTALL_SINGLETONS).
+  # User string literals start at slot 1.
+  lit_n = 1
+
+  # Inverse char-to-byte table for ASCII printable chars.
+  for (i = 32; i < 127; i++) ord_tbl[sprintf("%c", i)] = i
+}
+
+function byte_at(s, n) {
+  return ord_tbl[substr(s, n, 1)] + 0
+}
+
+# Emit one method DATA record for a primitive method body.  The
+# body is "<13> <prim> <8>" -- PRIMITIVE prim; RETURN_TOP.
+function emit_method_record(class_id, sel_id, prim, start_ln,    rec, n) {
+  rec[0] = class_id
+  rec[1] = sel_id
+  rec[2] = 3
+  rec[3] = 13
+  rec[4] = prim
+  rec[5] = 8
+  return emit_data_chunked(rec, 6, start_ln)
 }
 
 # Strip comments and trailing periods; normalise whitespace; split parens.
+# Also extract single-quoted string literals into the literal pool,
+# replacing each with a __LITn__ placeholder.
 {
   sub(/#.*$/, "")
+  while (match($0, /'[^']*'/)) {
+    s = substr($0, RSTART + 1, RLENGTH - 2)
+    lit_str[lit_n] = s
+    placeholder = "__LIT" lit_n "__"
+    $0 = substr($0, 1, RSTART - 1) placeholder substr($0, RSTART + RLENGTH)
+    lit_n++
+  }
   gsub(/\./, "")
   gsub(/\t/, " ")
   gsub(/\(/, " ( ")
@@ -363,6 +401,21 @@ function parse_atom(idx,    a, n, cur) {
     body[body_n++] = a + 0
     return idx + 1
   }
+  if (a == "Transcript") {
+    # Transcript is a singleton at literal-pool slot 0 (set by
+    # INSTALL_SINGLETONS).  Push the tagged ref directly; no "new".
+    body[body_n++] = 2            # PUSH_LIT
+    body[body_n++] = 0
+    return idx + 1
+  }
+  if (a ~ /^__LIT[0-9]+__$/) {
+    n = a
+    sub(/^__LIT/, "", n)
+    sub(/__$/, "", n)
+    body[body_n++] = 2            # PUSH_LIT
+    body[body_n++] = n + 0
+    return idx + 1
+  }
   if (a in cls) {
     if (idx + 1 > NF || $(idx + 1) != "new") {
       print "stc: bare class name '" a "' must be followed by 'new'" > "/dev/stderr"
@@ -475,8 +528,33 @@ END {
   print ln " GOSUB 10800"       ; ln += 1
   print ln " RETURN"
 
-  # Method DATA records at line 500+.
+  # Literal-pool records first (so T(slot) is populated before
+  # any method tries to push it).  Each record:
+  #   -2  <slot>  <byte-count>  <byte0>...<byteN-1>
   ln = 500
+  for (i = 1; i < lit_n; i++) {
+    s = lit_str[i]
+    n_bytes = length(s)
+    n_items = 3 + n_bytes
+    items[0] = -2
+    items[1] = i
+    items[2] = n_bytes
+    for (j = 0; j < n_bytes; j++) items[3 + j] = byte_at(s, j + 1)
+    ln = emit_data_chunked(items, n_items, ln)
+  }
+
+  # Built-in methods needed for v1 dialect (Transcript I/O,
+  # printString, print).  Skipped in MODE=methods_only because
+  # legacy demos (D5, D8) hand-assemble driver bytecode at fixed
+  # pool offsets that the extra builtins would overrun.
+  if (MODE != "methods_only") {
+    ln = emit_method_record(13, 16, 7, ln)   # Transcript>>show:
+    ln = emit_method_record(13, 17, 8, ln)   # Transcript>>cr
+    ln = emit_method_record(2,  18, 9, ln)   # SmallInteger>>printString
+    ln = emit_method_record(2,  5,  5, ln)   # SmallInteger>>print
+  }
+
+  # Method DATA records.
   for (i = 0; i < meth_n; i++) {
     n_items = 3 + m_len[i]
     items[0] = m_class[i]

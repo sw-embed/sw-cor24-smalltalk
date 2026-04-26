@@ -1,6 +1,6 @@
 number = 10
 slug = "refactor-vm-arrays"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: refactor-vm-arrays (depends on FR-1 in sw-cor24-basic)
 

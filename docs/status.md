@@ -1,6 +1,6 @@
 # COR24 Smalltalk v0 — Status
 
-_Updated: 2026-04-25 (saga step 009-refactor-image-data)_
+_Updated: 2026-04-25 (saga step 010-refactor-vm-arrays)_
 
 ## What runs today
 
@@ -237,6 +237,22 @@ this wart.
   blocks would loop forever in `ifTrue:ifFalse:` fact). Verified
   to `10 fact = 3628800` (depth-11 recursion). No new VM features
   needed.
+- 2026-04-25: FR-1 (DIM) dogfooded — every PEEK/POKE in the VM,
+  images, and drivers replaced by indexed array access. The VM
+  uses 13 single-letter arrays (`H`, `S`, `O`, `P`, `M`, `L`,
+  `R`, `Y`, `C`, `G`, `A`, `B`, `K`), each one named to match
+  the scalar register that meaningfully indexes it. BASIC v1's
+  scalar-vs-array namespace separation lets `M` the scalar
+  (current method's bcstart index) and `M` the array (saved
+  method addrs per frame) coexist without conflict. Discovered
+  during phase 1 that BASIC v1 only allows single-letter
+  variable names — my initial `DIM HP(511)` failed because `HP`
+  tokenized as scalar `H` followed by scalar `P`. Forced a full
+  redesign of the array-name plan around single letters.
+  Bytecode pool became `O(0..127)`; absolute scratch addresses
+  512..639 are gone — every driver now writes top-level
+  bytecode at indices 8/28/88 (was 520/540/600). Result:
+  `grep -c "PEEK\\|POKE" src/*.bas examples/*.bas` reports 0.
 - 2026-04-25: First FR dogfooded — image loaders now use FR-2
   (DATA/READ/RESTORE) instead of one POKE per byte. Added shared
   helper `read_and_install_methods` at `src/vm.bas` line 10800

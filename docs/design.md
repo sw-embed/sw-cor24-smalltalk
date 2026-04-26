@@ -377,8 +377,14 @@ All six FRs filed during step 001 have shipped on
 `sw-cor24-basic` `main`. Status of each from this project's
 point of view:
 
-- **FR-1** `DIM A(n)` integer arrays — *not yet dogfooded*
-  (saga step 010). VM still uses PEEK/POKE-as-array.
+- **FR-1** `DIM A(n)` integer arrays — **dogfooded**
+  (saga step 010, 2026-04-25). All VM data structures plus the
+  bytecode pool are now `DIM` arrays: `H`, `S`, `O`, `P`, `M`,
+  `L`, `R`, `Y`, `C`, `G`, `A`, `B`, `K`. Every `PEEK`/`POKE`
+  in `vm.bas`, the seven image files, and the seven drivers
+  has been removed. Driver top-level bytecode used to live at
+  scratch addresses 520/540/600; it now lives at `O()` indices
+  8/28/88.
 - **FR-2** `DATA` / `READ` / `RESTORE` — **dogfooded**
   (saga step 009, 2026-04-25). Image files dropped 371 -> 98
   lines via the self-describing DATA stream consumed by

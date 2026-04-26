@@ -100,7 +100,7 @@ the middle of dogfooding them; see `docs/status.md` and
 
 | FR | Feature | Dogfooded here? |
 |---|---|---|
-| FR-1 | `DIM` arrays | not yet (saga step 010) |
+| FR-1 | `DIM` arrays | **yes** — VM, images, drivers all use single-letter `DIM` arrays; zero `PEEK`/`POKE` in v0 source |
 | FR-2 | `DATA` / `READ` / `RESTORE` | **yes** — image files cut from 371 to 98 lines |
 | FR-3 | `ON expr GOTO/GOSUB` | not yet (saga step 011) |
 | FR-4 | `MOD` | not yet (saga step 012) |

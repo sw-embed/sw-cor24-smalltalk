@@ -1,0 +1,11 @@
+{
+  "task_type": "production",
+  "state": {
+    "number": 1,
+    "step": "compiler-allow-value-stmts-in-methods"
+  },
+  "action": "Edited tools/stc.awk to remove the in_main check from the value-statement branch; verified by recompiling each demo via scripts/run-st.sh.",
+  "result": "success",
+  "reward": 1,
+  "timestamp": "2026-05-09T12:02:16"
+}

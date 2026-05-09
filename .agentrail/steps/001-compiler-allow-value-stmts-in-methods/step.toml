@@ -1,6 +1,6 @@
 number = 1
 slug = "compiler-allow-value-stmts-in-methods"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: compiler-allow-value-stmts-in-methods
 
@@ -8,5 +8,6 @@ Today `stc.awk` only accepts b..."""
 role = "production"
 context_files = []
 created_at = "2026-04-26T14:44:32"
+completed_at = "2026-05-09T12:02:16"
 task_type = "production"
-commits = []
+commits = ["7513811f0a839a2960e9395be04a3b69c8ef9979"]

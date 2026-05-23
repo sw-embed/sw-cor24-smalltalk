@@ -1,0 +1,1 @@
+Dropped the in_main gate in stc.awk's catch-all clause so method bodies now POP value statements between statements. Methods like 'Transcript show: "higher". ^ self' compile cleanly; D1..D8 + hello.st all regress-pass.

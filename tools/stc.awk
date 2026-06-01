@@ -68,6 +68,7 @@ BEGIN {
   sel["cr"]               = 17
   sel["printString"]      = 18
   sel[","]                = 19
+  sel["check:"]           = 20
 
   is_binary["+"] = 1
   is_binary["-"] = 1
@@ -89,6 +90,7 @@ BEGIN {
   cls["BoundedCounter"]    = 11
   cls["String"]            = 12
   cls["Transcript"]        = 13
+  cls["GuessGame"]          = 14
 
   # Default ivar counts for built-in classes (zero unless user
   # redeclares with slots).  Counter and BoundedCounter get

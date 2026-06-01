@@ -1,0 +1,12 @@
+number = 2
+slug = "demo-guess"
+status = "completed"
+description = """
+# Step: demo-guess
+
+Port the guess-the-number game from `../sw-cor24-basic/ex..."""
+role = "production"
+context_files = []
+created_at = "2026-05-24T12:14:43"
+completed_at = "2026-05-24T14:38:48"
+commits = ["f5b60eaad9f510f77921044227f01302b23803ce"]

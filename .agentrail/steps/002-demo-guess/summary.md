@@ -1,0 +1,1 @@
+Added examples/guess.st with GuessGame class (secret slot, check: method printing higher/lower/got it via Transcript). Registered check: selector and GuessGame class in stc.awk. All D1-D8 + hello.st demos pass.
